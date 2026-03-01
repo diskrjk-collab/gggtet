@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V37.0</title>
+    <title>XREZZKY Ω-CHECKER V38.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -28,6 +28,12 @@
         }
         .accent-gradient {
             background: linear-gradient(135deg, #ff0055 0%, #7000ff 100%);
+        }
+        .success-gradient {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+        }
+        .failed-gradient {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
         }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -63,10 +69,8 @@
         }
         
         .password-card.copied {
-            opacity: 0.5;
-            filter: grayscale(0.5);
-            border-color: #ff0000 !important;
-            pointer-events: none;
+            opacity: 0.7;
+            border-color: #ffaa00 !important;
         }
         
         .password-card.copied::after {
@@ -74,7 +78,43 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #ff0000;
+            background: #ffaa00;
+            color: black;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .password-card.success {
+            border-color: #00ff88 !important;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        .password-card.success::after {
+            content: "✓ LOGIN BERHASIL";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #00ff88;
+            color: black;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .password-card.failed {
+            border-color: #ff3333 !important;
+            opacity: 0.5;
+        }
+        
+        .password-card.failed::after {
+            content: "✗ TIDAK COCOK";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff3333;
             color: white;
             font-size: 8px;
             padding: 2px 6px;
@@ -89,10 +129,6 @@
             gap: 1rem;
             padding: 0.5rem 0.25rem;
             scroll-behavior: smooth;
-        }
-        
-        .slider-container::-webkit-scrollbar {
-            height: 6px;
         }
         
         .match-badge {
@@ -128,23 +164,42 @@
             cursor: not-allowed;
         }
         
-        .history-indicator {
-            font-size: 10px;
-            padding: 4px 10px;
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .confirm-card {
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
             border-radius: 20px;
-            background: rgba(255, 165, 0, 0.2);
-            border: 1px solid rgba(255, 165, 0, 0.3);
-            color: orange;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
-        }
-        
-        .copy-success {
-            animation: pulse-green 0.5s ease;
+        .filter-btn.active {
+            background: #ff0055;
+            color: white;
         }
     </style>
 </head>
@@ -155,14 +210,14 @@
             <h1 class="mono text-2xl md:text-4xl font-bold tracking-tighter italic">
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
-            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest">V37.0 - 1x MUNDUR EDITION</p>
+            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest">V38.0 - LOGIN CONFIRMATION</p>
         </div>
         <div class="flex gap-2">
             <button onclick="clearAll()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all">
                 <i class="fas fa-trash-alt mr-2"></i> CLEAR ALL
             </button>
-            <button onclick="processData()" class="accent-gradient px-4 py-2 rounded-xl text-xs font-bold hover:scale-105 transition-all">
-                <i class="fas fa-bolt mr-2"></i> PROCESS
+            <button onclick="showResults()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all border border-purple-500/50">
+                <i class="fas fa-chart-bar mr-2"></i> HASIL
             </button>
         </div>
     </div>
@@ -189,16 +244,13 @@ robert
 robe</textarea>
                     </div>
 
-                    <!-- PASSWORD INPUT with EXAMPLE -->
+                    <!-- PASSWORD INPUT -->
                     <div>
                         <div class="flex justify-between mb-1">
                             <label class="text-[10px] mono text-gray-400">PASSWORDS</label>
                             <span id="pass-count" class="text-[10px] text-pink-400 mono">0</span>
                         </div>
-                        <textarea id="pass-input" rows="6" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2">'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'</textarea>
-                        <p class="text-[8px] text-green-400 mt-1 flex items-center gap-1">
-                            <i class="fas fa-check-circle"></i> AUTO CLEAN: 'text' → text
-                        </p>
+                        <textarea id="pass-input" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2">'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'</textarea>
                     </div>
 
                     <!-- MATCH THRESHOLD -->
@@ -211,17 +263,41 @@ robe</textarea>
                             <span class="text-[10px] text-gray-600">100%</span>
                         </div>
                     </div>
+
+                    <!-- PROCESS BUTTON (PINDAH KE BAWAH) -->
+                    <button onclick="processData()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-white shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-2">
+                        <i class="fas fa-bolt mr-2"></i> PROCESS DATA
+                    </button>
+
+                    <!-- AUTO OPEN OPTION -->
+                    <label class="flex items-center justify-between cursor-pointer group mt-2">
+                        <span class="text-xs text-gray-400 group-hover:text-white transition-colors flex items-center gap-2">
+                            <i class="fas fa-globe"></i> Auto-open Roblox setelah copy
+                        </span>
+                        <input type="checkbox" id="auto-open" class="accent-pink-600" checked>
+                    </label>
                 </div>
             </div>
         </div>
 
         <!-- RIGHT PANEL - RESULTS -->
         <div class="lg:col-span-8 space-y-4">
-            <!-- USER LIST -->
+            <!-- USER LIST & FILTERS -->
             <div class="glass rounded-2xl p-5">
-                <h3 class="text-sm font-bold mb-3 flex items-center gap-2">
-                    <i class="fas fa-users text-blue-500"></i> USER LIST
-                </h3>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold flex items-center gap-2">
+                        <i class="fas fa-users text-blue-500"></i> USER LIST
+                    </h3>
+                    
+                    <!-- FILTER BUTTONS -->
+                    <div class="flex gap-1">
+                        <span class="filter-btn" onclick="filterResults('all')" id="filter-all">ALL</span>
+                        <span class="filter-btn" onclick="filterResults('success')" id="filter-success">✓ BERHASIL</span>
+                        <span class="filter-btn" onclick="filterResults('failed')" id="filter-failed">✗ GAGAL</span>
+                        <span class="filter-btn" onclick="filterResults('pending')" id="filter-pending">⏳ PENDING</span>
+                    </div>
+                </div>
+                
                 <div id="user-list" class="flex flex-wrap gap-2 min-h-[60px] max-h-[120px] overflow-y-auto custom-scrollbar p-2">
                     <div class="text-gray-600 text-sm w-full text-center">Belum ada user. Klik PROCESS!</div>
                 </div>
@@ -237,14 +313,12 @@ robe</textarea>
                             <h2 id="selected-user-display" class="text-2xl font-bold mono">-</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <!-- History indicator -->
-                            <div id="history-indicator" class="history-indicator" style="display: none;">
-                                <i class="fas fa-history mr-1"></i> <span id="history-status">Bisa mundur 1x</span>
+                            <!-- Status counts -->
+                            <div class="flex gap-2 text-[10px]">
+                                <span class="text-green-400"><i class="fas fa-check-circle"></i> <span id="success-count">0</span></span>
+                                <span class="text-red-400"><i class="fas fa-times-circle"></i> <span id="failed-count">0</span></span>
+                                <span class="text-yellow-400"><i class="fas fa-clock"></i> <span id="pending-count">0</span></span>
                             </div>
-                            <!-- Copy all button (disabled di versi ini) -->
-                            <button disabled class="glass px-4 py-2 rounded-xl text-xs opacity-30 cursor-not-allowed">
-                                <i class="fas fa-ban mr-2"></i> 1x MUNDUR ONLY
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -281,23 +355,52 @@ robe</textarea>
                     </div>
                 </div>
 
-                <!-- Current Password Display -->
+                <!-- Current Password Display & Actions -->
                 <div class="px-5 pb-5">
                     <div class="glass-dark p-4 rounded-xl">
                         <p class="text-[8px] text-gray-500 mb-1">CURRENT SELECTION</p>
-                        <div class="flex justify-between items-center">
-                            <div>
+                        <div class="flex flex-col md:flex-row gap-3 justify-between items-center">
+                            <div class="flex-1">
                                 <span id="current-user-display" class="mono text-sm font-bold">-</span>
                                 <span class="text-gray-600 mx-1">:</span>
                                 <span id="current-pass-display" class="mono text-sm text-pink-400">-</span>
                             </div>
-                            <button id="copy-current-btn" onclick="copyCurrentPassword()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                <i class="fas fa-copy"></i> COPY THIS
-                            </button>
+                            <div class="flex gap-2">
+                                <button id="copy-current-btn" onclick="copyCurrentPassword()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fas fa-copy"></i> COPY
+                                </button>
+                                <button id="success-btn" onclick="markAsSuccess()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition-all" style="display: none;">
+                                    <i class="fas fa-check"></i> BISA LOGIN
+                                </button>
+                                <button id="failed-btn" onclick="markAsFailed()" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-xs font-bold transition-all" style="display: none;">
+                                    <i class="fas fa-times"></i> TIDAK COCOK
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirm-modal" class="confirm-modal" style="display: none;">
+        <div class="confirm-card glass p-6 rounded-3xl">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-question-circle text-yellow-500"></i> KONFIRMASI LOGIN
+            </h3>
+            <p class="text-sm mb-4">Apakah combo <span id="modal-combo" class="mono text-pink-400 font-bold"></span> berhasil login?</p>
+            <div class="flex gap-3">
+                <button onclick="confirmSuccess()" class="flex-1 success-gradient py-3 rounded-xl font-bold text-black hover:scale-105 transition-all">
+                    <i class="fas fa-check-circle mr-2"></i> BISA LOGIN
+                </button>
+                <button onclick="confirmFailed()" class="flex-1 failed-gradient py-3 rounded-xl font-bold text-white hover:scale-105 transition-all">
+                    <i class="fas fa-times-circle mr-2"></i> TIDAK COCOK
+                </button>
+            </div>
+            <button onclick="closeModal()" class="w-full mt-3 glass py-2 rounded-xl text-sm hover:bg-white/10 transition-all">
+                TUTUP
+            </button>
         </div>
     </div>
 
@@ -310,14 +413,19 @@ robe</textarea>
         // ==================== DATA STORE ====================
         let users = [];
         let passwords = [];
-        let matches = []; // [{ user, password, score }]
+        let matches = []; // [{ user, password, score, status: 'pending'|'success'|'failed' }]
         let selectedUser = null;
-        let copiedCombos = new Set(); // Untuk tracking yang udah dicopy
         
         // Slider state
         let currentIndex = 0;
-        let lastIndex = -1; // Untuk tracking mundur 1x
-        let hasMundur = false; // Apakah sudah pernah mundur?
+        let currentFilter = 'all'; // all, success, failed, pending
+        
+        // Status tracking
+        const statusColors = {
+            pending: 'text-yellow-400',
+            success: 'text-green-400',
+            failed: 'text-red-400'
+        };
 
         // ==================== UTILITY FUNCTIONS ====================
         function showToast(msg, duration = 2000) {
@@ -333,28 +441,22 @@ robe</textarea>
         }
 
         function cleanQuotes(text) {
-            // Hilangkan kutip di awal dan akhir, juga koma
             return text.replace(/^['"]|['"]$|,$/g, '').trim();
         }
 
         function parseInput(input) {
-            // Pisah berdasarkan koma atau newline
-            const items = input.split(/[,\n]/)
+            return input.split(/[,\n]/)
                 .map(item => item.trim())
                 .filter(item => item.length > 0)
                 .map(item => cleanQuotes(item));
-            return items;
         }
 
         function updateCounts() {
             const rawUsers = document.getElementById('user-input').value;
             const rawPasses = document.getElementById('pass-input').value;
             
-            const userItems = parseInput(rawUsers);
-            const passItems = parseInput(rawPasses);
-            
-            document.getElementById('user-count').innerText = userItems.length;
-            document.getElementById('pass-count').innerText = passItems.length;
+            document.getElementById('user-count').innerText = parseInput(rawUsers).length;
+            document.getElementById('pass-count').innerText = parseInput(rawPasses).length;
         }
 
         function updateThresholdLabel() {
@@ -371,10 +473,8 @@ robe</textarea>
             
             let score = 0;
             
-            // User ada di dalam password atau sebaliknya
             if (p.includes(u) || u.includes(p)) score += 50;
             
-            // Prefix match
             let prefixCount = 0;
             for (let i = 0; i < Math.min(u.length, p.length); i++) {
                 if (u[i] === p[i]) prefixCount++;
@@ -382,7 +482,6 @@ robe</textarea>
             }
             score += (prefixCount * 5);
             
-            // Number match
             const uNums = u.replace(/\D/g, '');
             const pNums = p.replace(/\D/g, '');
             if (uNums && pNums) {
@@ -396,12 +495,8 @@ robe</textarea>
         // ==================== PROCESS DATA ====================
         function processData() {
             // Parse users
-            const rawUsers = document.getElementById('user-input').value;
-            users = parseInput(rawUsers);
-            
-            // Parse passwords
-            const rawPasswords = document.getElementById('pass-input').value;
-            passwords = parseInput(rawPasswords);
+            users = parseInput(document.getElementById('user-input').value);
+            passwords = parseInput(document.getElementById('pass-input').value);
             
             if (users.length === 0 || passwords.length === 0) {
                 showToast('ISI USERNAME DAN PASSWORD DULU!', 3000);
@@ -416,12 +511,17 @@ robe</textarea>
                 passwords.forEach(password => {
                     const score = calculateSimilarity(user, password);
                     if (score >= threshold) {
-                        matches.push({ user, password, score });
+                        matches.push({ 
+                            user, 
+                            password, 
+                            score,
+                            status: 'pending' // pending, success, failed
+                        });
                     }
                 });
             });
 
-            // Urutin per user biar yang paling tinggi di atas
+            // Urutin per user
             matches.sort((a, b) => {
                 if (a.user === b.user) return b.score - a.score;
                 return a.user.localeCompare(b.user);
@@ -429,22 +529,22 @@ robe</textarea>
 
             // Update UI
             updateUserList();
+            updateFilterButtons();
 
             // Reset selected user
             selectedUser = null;
             currentIndex = 0;
-            lastIndex = -1;
-            hasMundur = false;
             
             document.getElementById('selected-user-display').innerText = '-';
             document.getElementById('current-user-display').innerText = '-';
             document.getElementById('current-pass-display').innerText = '-';
             document.getElementById('password-slider').style.display = 'none';
             document.getElementById('no-password-selected').style.display = 'block';
-            document.getElementById('history-indicator').style.display = 'none';
             document.getElementById('prev-btn').disabled = true;
             document.getElementById('next-btn').disabled = true;
             document.getElementById('password-counter').innerText = '0/0';
+            document.getElementById('success-btn').style.display = 'none';
+            document.getElementById('failed-btn').style.display = 'none';
 
             showToast(`✅ DITEMUKAN ${matches.length} KOMBINASI`, 2000);
         }
@@ -459,15 +559,21 @@ robe</textarea>
                 return;
             }
 
-            // Group matches by user untuk ngitung jumlah password per user
-            const matchCountByUser = {};
+            // Hitung status per user
+            const userStats = {};
+            users.forEach(user => {
+                userStats[user] = { total: 0, success: 0, failed: 0, pending: 0 };
+            });
+
             matches.forEach(m => {
-                if (!matchCountByUser[m.user]) matchCountByUser[m.user] = 0;
-                matchCountByUser[m.user]++;
+                if (userStats[m.user]) {
+                    userStats[m.user].total++;
+                    userStats[m.user][m.status]++;
+                }
             });
 
             users.forEach(user => {
-                const matchCount = matchCountByUser[user] || 0;
+                const stats = userStats[user] || { total: 0, success: 0, failed: 0, pending: 0 };
                 const isSelected = (selectedUser === user);
                 
                 const userElement = document.createElement('div');
@@ -476,8 +582,12 @@ robe</textarea>
                 userElement.onclick = () => selectUser(user);
                 
                 userElement.innerHTML = `
-                    <span class="mono truncate max-w-[150px]">${user}</span>
-                    <span class="text-[10px] ${matchCount > 0 ? 'bg-pink-500/20' : 'bg-gray-500/20'} px-2 py-0.5 rounded-full ml-auto">${matchCount}</span>
+                    <span class="mono truncate max-w-[100px]">${user}</span>
+                    <div class="flex gap-1 ml-auto">
+                        ${stats.success > 0 ? `<span class="text-[8px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">${stats.success}</span>` : ''}
+                        ${stats.failed > 0 ? `<span class="text-[8px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">${stats.failed}</span>` : ''}
+                        ${stats.pending > 0 ? `<span class="text-[8px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">${stats.pending}</span>` : ''}
+                    </div>
                 `;
                 
                 container.appendChild(userElement);
@@ -489,7 +599,7 @@ robe</textarea>
             selectedUser = user;
             document.getElementById('selected-user-display').innerText = user;
             
-            // Update selected state di user list
+            // Update selected state
             document.querySelectorAll('.user-item').forEach(el => {
                 if (el.getAttribute('data-user') === user) {
                     el.classList.add('selected');
@@ -498,39 +608,46 @@ robe</textarea>
                 }
             });
 
-            // Filter matches untuk user ini
-            const userMatches = matches.filter(m => m.user === user);
+            // Filter matches
+            const userMatches = getFilteredMatchesForUser(user);
             
             if (userMatches.length > 0) {
-                // Reset slider state
                 currentIndex = 0;
-                lastIndex = -1;
-                hasMundur = false;
                 
-                // Tampilkan slider
                 document.getElementById('password-slider').style.display = 'flex';
                 document.getElementById('no-password-selected').style.display = 'none';
-                document.getElementById('history-indicator').style.display = 'flex';
-                document.getElementById('history-status').innerText = 'Bisa mundur 1x';
                 
                 renderPasswordSlider(userMatches);
                 updateCurrentDisplay(userMatches);
                 updateNavButtons(userMatches.length);
+                updateStatusCounts(user);
             } else {
-                // Ga ada password yang cocok
                 document.getElementById('password-slider').style.display = 'none';
                 document.getElementById('no-password-selected').style.display = 'block';
                 document.getElementById('no-password-selected').innerHTML = `
                     <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
-                    <p class="text-sm">Tidak ada password yang cocok untuk user ini</p>
+                    <p class="text-sm">Tidak ada password dengan filter ${currentFilter}</p>
                 `;
-                document.getElementById('history-indicator').style.display = 'none';
                 document.getElementById('current-user-display').innerText = '-';
                 document.getElementById('current-pass-display').innerText = '-';
-                document.getElementById('prev-btn').disabled = true;
-                document.getElementById('next-btn').disabled = true;
-                document.getElementById('password-counter').innerText = '0/0';
+                document.getElementById('success-btn').style.display = 'none';
+                document.getElementById('failed-btn').style.display = 'none';
             }
+        }
+
+        function getFilteredMatchesForUser(user) {
+            let userMatches = matches.filter(m => m.user === user);
+            
+            // Apply filter
+            if (currentFilter === 'success') {
+                userMatches = userMatches.filter(m => m.status === 'success');
+            } else if (currentFilter === 'failed') {
+                userMatches = userMatches.filter(m => m.status === 'failed');
+            } else if (currentFilter === 'pending') {
+                userMatches = userMatches.filter(m => m.status === 'pending');
+            }
+            
+            return userMatches;
         }
 
         // ==================== RENDER PASSWORD SLIDER ====================
@@ -539,17 +656,13 @@ robe</textarea>
             slider.innerHTML = '';
 
             userMatches.forEach((match, index) => {
-                const combo = `${match.user}:${match.password}`;
-                const isCopied = copiedCombos.has(combo);
-                
                 const card = document.createElement('div');
-                card.className = `password-card glass p-4 rounded-xl border ${isCopied ? 'copied' : 'border-white/10'}`;
-                card.setAttribute('data-combo', combo);
+                card.className = `password-card glass p-4 rounded-xl border ${match.status}`;
                 card.setAttribute('data-index', index);
                 card.setAttribute('data-password', match.password);
-                card.setAttribute('data-score', match.score);
+                card.setAttribute('data-status', match.status);
                 
-                // Match badge color based on score
+                // Match badge color
                 let badgeClass = 'from-green-500 to-green-600';
                 if (match.score < 60) badgeClass = 'from-yellow-500 to-yellow-600';
                 if (match.score < 40) badgeClass = 'from-red-500 to-red-600';
@@ -559,12 +672,14 @@ robe</textarea>
                         <span class="match-badge bg-gradient-to-r ${badgeClass}">${match.score}% match</span>
                     </div>
                     <div class="mono text-sm mb-4 break-all min-h-[60px]">${match.password}</div>
-                    <div class="text-[8px] text-gray-500 text-right">
-                        #${index + 1}
+                    <div class="flex justify-between items-center">
+                        <span class="text-[8px] ${statusColors[match.status]}">
+                            ${match.status === 'success' ? '✓ BERHASIL' : match.status === 'failed' ? '✗ GAGAL' : '⏳ PENDING'}
+                        </span>
+                        <span class="text-[8px] text-gray-500">#${index + 1}</span>
                     </div>
                 `;
                 
-                // Klik card untuk pilih password ini
                 card.onclick = () => {
                     const idx = parseInt(card.getAttribute('data-index'));
                     goToIndex(idx, userMatches);
@@ -582,51 +697,48 @@ robe</textarea>
             }, 100);
         }
 
-        // ==================== UPDATE CURRENT DISPLAY ====================
+        // ==================== UPDATE DISPLAY ====================
         function updateCurrentDisplay(userMatches) {
             if (userMatches.length > 0 && currentIndex < userMatches.length) {
                 const current = userMatches[currentIndex];
                 document.getElementById('current-user-display').innerText = current.user;
                 document.getElementById('current-pass-display').innerText = current.password;
                 document.getElementById('password-counter').innerText = `${currentIndex + 1}/${userMatches.length}`;
+                
+                // Tampilkan/sembunyikan tombol konfirmasi berdasarkan status
+                if (current.status === 'pending') {
+                    document.getElementById('success-btn').style.display = 'block';
+                    document.getElementById('failed-btn').style.display = 'block';
+                } else {
+                    document.getElementById('success-btn').style.display = 'none';
+                    document.getElementById('failed-btn').style.display = 'none';
+                }
             }
         }
 
-        // ==================== UPDATE NAV BUTTONS ====================
         function updateNavButtons(totalItems) {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            
-            // Prev: bisa kalau bukan index 0 DAN (belum pernah mundur ATAU mundur terakhir dari index yang berbeda)
-            const canPrev = currentIndex > 0;
-            prevBtn.disabled = !canPrev;
-            
-            // Next: bisa kalau bukan index terakhir
-            const canNext = currentIndex < totalItems - 1;
-            nextBtn.disabled = !canNext;
-            
-            // Update history indicator
-            if (lastIndex !== -1 && currentIndex === lastIndex) {
-                document.getElementById('history-status').innerText = 'Sedang di posisi mundur';
-                document.getElementById('history-indicator').style.background = 'rgba(255, 165, 0, 0.3)';
-            } else {
-                document.getElementById('history-status').innerText = hasMundur ? 'Sudah pernah mundur' : 'Bisa mundur 1x';
-                document.getElementById('history-indicator').style.background = 'rgba(255, 165, 0, 0.2)';
-            }
+            document.getElementById('prev-btn').disabled = currentIndex <= 0;
+            document.getElementById('next-btn').disabled = currentIndex >= totalItems - 1;
         }
 
-        // ==================== GO TO INDEX ====================
-        function goToIndex(index, userMatches) {
-            if (!userMatches) {
-                userMatches = matches.filter(m => m.user === selectedUser);
-            }
+        function updateStatusCounts(user) {
+            const userMatches = matches.filter(m => m.user === user);
+            const success = userMatches.filter(m => m.status === 'success').length;
+            const failed = userMatches.filter(m => m.status === 'failed').length;
+            const pending = userMatches.filter(m => m.status === 'pending').length;
             
+            document.getElementById('success-count').innerText = success;
+            document.getElementById('failed-count').innerText = failed;
+            document.getElementById('pending-count').innerText = pending;
+        }
+
+        // ==================== NAVIGATION ====================
+        function goToIndex(index, userMatches) {
             if (index >= 0 && index < userMatches.length) {
                 currentIndex = index;
                 updateCurrentDisplay(userMatches);
                 updateNavButtons(userMatches.length);
                 
-                // Scroll ke card yang dipilih
                 const slider = document.getElementById('password-slider');
                 const cards = slider.children;
                 if (cards.length > index) {
@@ -635,23 +747,15 @@ robe</textarea>
             }
         }
 
-        // ==================== SLIDE NAVIGATION ====================
         function slidePrev() {
-            const userMatches = matches.filter(m => m.user === selectedUser);
+            const userMatches = getFilteredMatchesForUser(selectedUser);
             if (!userMatches.length) return;
             
             if (currentIndex > 0) {
-                // Simpan index sebelumnya untuk tracking mundur
-                if (!hasMundur && currentIndex > 0) {
-                    lastIndex = currentIndex;
-                    hasMundur = true;
-                }
-                
                 currentIndex--;
                 updateCurrentDisplay(userMatches);
                 updateNavButtons(userMatches.length);
                 
-                // Scroll
                 const slider = document.getElementById('password-slider');
                 const cards = slider.children;
                 if (cards.length > currentIndex) {
@@ -661,7 +765,7 @@ robe</textarea>
         }
 
         function slideNext() {
-            const userMatches = matches.filter(m => m.user === selectedUser);
+            const userMatches = getFilteredMatchesForUser(selectedUser);
             if (!userMatches.length) return;
             
             if (currentIndex < userMatches.length - 1) {
@@ -669,7 +773,6 @@ robe</textarea>
                 updateCurrentDisplay(userMatches);
                 updateNavButtons(userMatches.length);
                 
-                // Scroll
                 const slider = document.getElementById('password-slider');
                 const cards = slider.children;
                 if (cards.length > currentIndex) {
@@ -678,54 +781,290 @@ robe</textarea>
             }
         }
 
-        // ==================== COPY CURRENT PASSWORD ====================
+                // ==================== COPY & CONFIRM ====================
         function copyCurrentPassword() {
             if (!selectedUser) {
                 showToast('PILIH USER DULU!', 1500);
                 return;
             }
 
-            const userMatches = matches.filter(m => m.user === selectedUser);
+            const userMatches = getFilteredMatchesForUser(selectedUser);
             if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
 
             const current = userMatches[currentIndex];
             const combo = `${current.user}:${current.password}`;
             
-            // Cek udah pernah dicopy
-            if (copiedCombos.has(combo)) {
-                showToast('❌ SUDAH PERNAH DI COPY!', 1500);
-                return;
-            }
-
             // Copy ke clipboard
             navigator.clipboard.writeText(combo).then(() => {
-                // Tandai sebagai copied
-                copiedCombos.add(combo);
+                showToast(`✅ COPIED: ${combo}`, 1500);
                 
-                // Update card visual
+                // Tandai card sebagai copied (tapi status tetap pending)
                 const slider = document.getElementById('password-slider');
                 const cards = slider.children;
                 if (cards.length > currentIndex) {
                     cards[currentIndex].classList.add('copied');
+                    setTimeout(() => {
+                        cards[currentIndex].classList.remove('copied');
+                    }, 2000);
                 }
                 
-                // Animasi button
-                const copyBtn = document.getElementById('copy-current-btn');
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> COPIED!';
-                copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                copyBtn.disabled = true;
+                // Tampilkan modal konfirmasi
+                showConfirmModal(current);
                 
-                setTimeout(() => {
-                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> COPY THIS';
-                    copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    copyBtn.classList.add('bg-pink-600', 'hover:bg-pink-700');
-                    copyBtn.disabled = false;
-                }, 2000);
-                
-                showToast(`✅ COPIED: ${combo}`, 1500);
+                // Auto open roblox jika di checklist
+                if (document.getElementById('auto-open').checked) {
+                    window.open('https://www.roblox.com/login', '_blank');
+                }
             }).catch(err => {
                 showToast('❌ GAGAL COPY!', 1500);
             });
+        }
+
+        // ==================== CONFIRMATION MODAL ====================
+        let currentConfirmMatch = null;
+
+        function showConfirmModal(match) {
+            currentConfirmMatch = match;
+            const modal = document.getElementById('confirm-modal');
+            const modalCombo = document.getElementById('modal-combo');
+            modalCombo.innerText = `${match.user}:${match.password}`;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+            currentConfirmMatch = null;
+        }
+
+        function confirmSuccess() {
+            if (currentConfirmMatch) {
+                // Update status di matches
+                const match = matches.find(m => 
+                    m.user === currentConfirmMatch.user && 
+                    m.password === currentConfirmMatch.password
+                );
+                if (match) {
+                    match.status = 'success';
+                }
+                
+                showToast('✅ Ditandai sebagai BERHASIL LOGIN!', 1500);
+                closeModal();
+                
+                // Refresh UI
+                if (selectedUser) {
+                    updateStatusCounts(selectedUser);
+                    updateUserList();
+                    
+                    // Refresh slider dengan filter yang sama
+                    const userMatches = getFilteredMatchesForUser(selectedUser);
+                    if (userMatches.length > 0) {
+                        renderPasswordSlider(userMatches);
+                        updateCurrentDisplay(userMatches);
+                    } else {
+                        // Kalau ga ada hasil dengan filter ini, reset ke filter all
+                        if (currentFilter !== 'all') {
+                            filterResults('all');
+                        } else {
+                            document.getElementById('password-slider').style.display = 'none';
+                            document.getElementById('no-password-selected').style.display = 'block';
+                        }
+                    }
+                }
+            }
+        }
+
+        function confirmFailed() {
+            if (currentConfirmMatch) {
+                // Update status di matches
+                const match = matches.find(m => 
+                    m.user === currentConfirmMatch.user && 
+                    m.password === currentConfirmMatch.password
+                );
+                if (match) {
+                    match.status = 'failed';
+                }
+                
+                showToast('❌ Ditandai sebagai TIDAK COCOK', 1500);
+                closeModal();
+                
+                // Refresh UI
+                if (selectedUser) {
+                    updateStatusCounts(selectedUser);
+                    updateUserList();
+                    
+                    // Refresh slider dengan filter yang sama
+                    const userMatches = getFilteredMatchesForUser(selectedUser);
+                    if (userMatches.length > 0) {
+                        renderPasswordSlider(userMatches);
+                        updateCurrentDisplay(userMatches);
+                    } else {
+                        // Kalau ga ada hasil dengan filter ini, reset ke filter all
+                        if (currentFilter !== 'all') {
+                            filterResults('all');
+                        } else {
+                            document.getElementById('password-slider').style.display = 'none';
+                            document.getElementById('no-password-selected').style.display = 'block';
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==================== FILTER RESULTS ====================
+        function filterResults(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`filter-${filter}`).classList.add('active');
+            
+            // Kalau ada user yang dipilih, refresh tampilan
+            if (selectedUser) {
+                const userMatches = getFilteredMatchesForUser(selectedUser);
+                
+                if (userMatches.length > 0) {
+                    currentIndex = 0;
+                    document.getElementById('password-slider').style.display = 'flex';
+                    document.getElementById('no-password-selected').style.display = 'none';
+                    
+                    renderPasswordSlider(userMatches);
+                    updateCurrentDisplay(userMatches);
+                    updateNavButtons(userMatches.length);
+                } else {
+                    document.getElementById('password-slider').style.display = 'none';
+                    document.getElementById('no-password-selected').style.display = 'block';
+                    document.getElementById('no-password-selected').innerHTML = `
+                        <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                        <p class="text-sm">Tidak ada password dengan filter ${filter}</p>
+                    `;
+                    document.getElementById('current-user-display').innerText = '-';
+                    document.getElementById('current-pass-display').innerText = '-';
+                    document.getElementById('success-btn').style.display = 'none';
+                    document.getElementById('failed-btn').style.display = 'none';
+                }
+            }
+            
+            showToast(`Filter: ${filter.toUpperCase()}`, 1000);
+        }
+
+        function updateFilterButtons() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('filter-all').classList.add('active');
+        }
+
+        // ==================== MARK AS (Tombol cepat) ====================
+        function markAsSuccess() {
+            if (!selectedUser) return;
+            
+            const userMatches = getFilteredMatchesForUser(selectedUser);
+            if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
+            
+            const current = userMatches[currentIndex];
+            
+            // Update status
+            const match = matches.find(m => 
+                m.user === current.user && 
+                m.password === current.password
+            );
+            if (match) {
+                match.status = 'success';
+            }
+            
+            showToast('✅ Ditandai BERHASIL!', 1000);
+            
+            // Refresh
+            updateStatusCounts(selectedUser);
+            updateUserList();
+            
+            // Lanjut ke next password
+            slideNext();
+        }
+
+        function markAsFailed() {
+            if (!selectedUser) return;
+            
+            const userMatches = getFilteredMatchesForUser(selectedUser);
+            if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
+            
+            const current = userMatches[currentIndex];
+            
+            // Update status
+            const match = matches.find(m => 
+                m.user === current.user && 
+                m.password === current.password
+            );
+            if (match) {
+                match.status = 'failed';
+            }
+            
+            showToast('❌ Ditandai GAGAL', 1000);
+            
+            // Refresh
+            updateStatusCounts(selectedUser);
+            updateUserList();
+            
+            // Lanjut ke next password
+            slideNext();
+        }
+
+        // ==================== SHOW RESULTS ====================
+        function showResults() {
+            if (matches.length === 0) {
+                showToast('Tidak ada data! Proses dulu.', 1500);
+                return;
+            }
+            
+            // Hitung statistik
+            const total = matches.length;
+            const success = matches.filter(m => m.status === 'success').length;
+            const failed = matches.filter(m => m.status === 'failed').length;
+            const pending = matches.filter(m => m.status === 'pending').length;
+            
+            // Buat laporan
+            const report = `
+═══════════════════════════
+   XREZZKY Ω-CHECKER v38.0
+═══════════════════════════
+
+📊 HASIL ANALISIS:
+━━━━━━━━━━━━━━━━━━━
+✅ BERHASIL LOGIN: ${success}
+❌ TIDAK COCOK   : ${failed}
+⏳ PENDING       : ${pending}
+📈 TOTAL         : ${total}
+
+👥 DETAIL PER USER:
+━━━━━━━━━━━━━━━━━━━
+${users.map(user => {
+    const userMatches = matches.filter(m => m.user === user);
+    const userSuccess = userMatches.filter(m => m.status === 'success').length;
+    const userFailed = userMatches.filter(m => m.status === 'failed').length;
+    const userPending = userMatches.filter(m => m.status === 'pending').length;
+    return `${user}: ✓${userSuccess} ✗${userFailed} ⏳${userPending}`;
+}).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━
+📋 LIST BERHASIL:
+${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString()}
+            `;
+            
+            // Tampilkan di console
+            console.log(report);
+            
+            // Copy ke clipboard
+            navigator.clipboard.writeText(report).then(() => {
+                showToast('📋 Laporan hasil dicopy ke clipboard!', 2000);
+            });
+            
+            // Bisa juga ditampilkan di alert (tapi kepanjangan)
+            alert(`HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n\nDetail sudah di console & clipboard!`);
         }
 
         // ==================== CLEAR ALL ====================
@@ -743,19 +1082,24 @@ robe</textarea>
                     <i class="fas fa-arrow-left text-3xl mb-3"></i>
                     <p class="text-sm">Pilih user dulu dari daftar di atas</p>
                 `;
-                document.getElementById('history-indicator').style.display = 'none';
+                document.getElementById('success-btn').style.display = 'none';
+                document.getElementById('failed-btn').style.display = 'none';
                 document.getElementById('prev-btn').disabled = true;
                 document.getElementById('next-btn').disabled = true;
                 document.getElementById('password-counter').innerText = '0/0';
+                document.getElementById('success-count').innerText = '0';
+                document.getElementById('failed-count').innerText = '0';
+                document.getElementById('pending-count').innerText = '0';
+                
+                // Reset filter
+                currentFilter = 'all';
+                updateFilterButtons();
                 
                 users = [];
                 passwords = [];
                 matches = [];
                 selectedUser = null;
-                copiedCombos.clear();
                 currentIndex = 0;
-                lastIndex = -1;
-                hasMundur = false;
                 
                 updateCounts();
                 showToast('🧹 SEMUA DIHAPUS', 1500);
@@ -769,12 +1113,12 @@ robe</textarea>
         // Auto-update threshold label
         updateThresholdLabel();
 
-        // Auto process on load with sample data
+        // Auto process on load
         window.onload = function() {
-            // Auto clean and process
             setTimeout(() => {
                 processData();
                 updateCounts();
+                updateFilterButtons();
             }, 500);
         };
     </script>
