@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V40.0</title>
+    <title>XREZZKY Ω-CHECKER V41.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -44,6 +44,19 @@
             font-size: 8px;
             font-weight: bold;
             color: black;
+        }
+        
+        /* INFO PANEL */
+        .info-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #ff0055;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            color: #aaa;
+        }
+        .info-panel strong {
+            color: #ff0055;
         }
         
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -257,9 +270,42 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        /* TIMER ANIMATION */
+        @keyframes countdown {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        .timer-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #ff0055, #7000ff);
+            animation: countdown 5s linear forwards;
+        }
+        
+        .copy-status {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(255, 0, 85, 0.2);
+            border: 1px solid #ff0055;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9px;
+            color: #333;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+        }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen">
+<body class="p-4 md:p-8 min-h-screen flex flex-col">
 
     <div class="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="text-left">
@@ -267,8 +313,8 @@
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
             <p class="text-gray-500 mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                V40.0 - SUPER AKURAT 
-                <span class="akurat-badge">3-4 HURUF/ANGKA SAMA</span>
+                V41.0 - COPY BERTAHAP 
+                <span class="akurat-badge">USER → 5s → PASS</span>
                 <span class="storage-indicator">
                     <i class="fas fa-database"></i> Auto-save
                 </span>
@@ -285,7 +331,7 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
         <!-- LEFT PANEL - INPUT -->
         <div class="lg:col-span-4 space-y-4">
@@ -313,7 +359,7 @@
                         <textarea id="pass-input" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2"></textarea>
                     </div>
 
-                    <!-- MATCH THRESHOLD - TETAP 30% -->
+                    <!-- MATCH THRESHOLD -->
                     <div class="glass-dark p-4 rounded-2xl">
                         <label class="text-xs text-gray-400 block mb-2 flex items-center gap-2">
                             MINIMUM MATCH SCORE
@@ -347,6 +393,25 @@
                     <div class="text-[8px] text-gray-600 flex justify-between items-center border-t border-white/5 pt-2 mt-2">
                         <span><i class="fas fa-save mr-1"></i> Auto-save setiap perubahan</span>
                         <span id="last-saved" class="text-green-500/50">-</span>
+                    </div>
+
+                    <!-- INFO PANEL - DISCLAIMER -->
+                    <div class="info-panel mt-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-info-circle text-pink-500"></i>
+                            <span class="font-bold text-white">INFORMASI SISTEM</span>
+                        </div>
+                        <ul class="space-y-1 list-disc list-inside text-[9px]">
+                            <li><strong>Kami hanya mengecek</strong> kecocokan antara username dan password berdasarkan pola huruf/angka.</li>
+                            <li><strong>Jika tidak akurat</strong> dengan akun asli, itu bukan urusan kami.</li>
+                            <li><strong>Web ini khusus PG</strong> (Password Generator/Checker) - bukan tools hacking.</li>
+                            <li><strong>Data tersimpan</strong> di device kamu sendiri (local storage).</li>
+                            <li><strong>Akurasi berdasarkan:</strong> kemiripan huruf (min 3), angka (min 3), prefix, suffix, substring.</li>
+                            <li><strong>Status login</strong> hanya untuk tracking pribadi, bukan verifikasi resmi.</li>
+                        </ul>
+                        <div class="mt-2 text-[8px] text-gray-600 border-t border-white/5 pt-2">
+                            ⚠️ Penggunaan di luar tanggung jawab pengguna. Kami hanya menyediakan alat bantu analisis.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -411,6 +476,16 @@
                     </div>
                 </div>
 
+                <!-- COPY STATUS INDICATOR -->
+                <div id="copy-status-container" class="px-5 pt-2" style="display: none;">
+                    <div class="copy-status">
+                        <i class="fas fa-clock"></i> <span id="copy-status-text">Menyalin user...</span>
+                    </div>
+                    <div class="w-full bg-white/10 rounded-full mt-1 overflow-hidden">
+                        <div id="timer-bar" class="timer-bar"></div>
+                    </div>
+                </div>
+
                 <!-- Password Slider -->
                 <div class="p-5 pt-2">
                     <div id="password-slider-container" class="relative">
@@ -438,8 +513,8 @@
                                 <span id="current-pass-display" class="mono text-sm text-pink-400">-</span>
                             </div>
                             <div class="flex gap-2">
-                                <button id="copy-current-btn" onclick="copyCurrentPassword()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fas fa-copy"></i> COPY
+                                <button id="copy-current-btn" onclick="startDelayedCopy()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fas fa-copy"></i> COPY (5s)
                                 </button>
                                 <button id="success-btn" onclick="markAsSuccess()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition-all" style="display: none;">
                                     <i class="fas fa-check"></i> BISA LOGIN
@@ -452,6 +527,26 @@
                     </div>
                 </div>
             </div>
+
+            <!-- INFO PANEL KECIL DI BAWAH RESULTS -->
+            <div class="glass p-3 rounded-xl text-[8px] text-gray-500 flex items-center gap-2">
+                <i class="fas fa-shield-alt text-pink-500"></i>
+                <span>Web ini khusus PG (Password Generator/Checker) - Kami hanya mengecek kecocokan pola, bukan menjamin akun. Ketidakakuratan bukan urusan kami.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER DENGAN DISCLAIMER LENGKAP -->
+    <div class="footer max-w-7xl mx-auto w-full mt-8">
+        <div class="text-[8px] text-gray-700 space-y-1">
+            <p>© 2025 XREZZKY Ω-CHECKER v41.0 - SUPER AKURAT EDITION</p>
+            <p class="flex items-center justify-center gap-2">
+                <span class="w-1 h-1 bg-pink-500 rounded-full"></span>
+                <span>SISTEM INI HANYA UNTUK PENGECEKAN KECOCOKAN USER & PASSWORD</span>
+                <span class="w-1 h-1 bg-pink-500 rounded-full"></span>
+            </p>
+            <p>⚠️ DISCLAIMER: Kami tidak bertanggung jawab atas penggunaan di luar fungsi. Jika tidak akurat dengan akun asli, itu di luar kendali kami. Web khusus PG - Password Generator/Checker.</p>
+            <p class="mt-2 text-gray-800">💾 Data tersimpan di local storage device masing-masing. Hapus data via tombol CLEAR ALL DATA.</p>
         </div>
     </div>
 
@@ -462,6 +557,7 @@
                 <i class="fas fa-question-circle text-yellow-500"></i> KONFIRMASI LOGIN
             </h3>
             <p class="text-sm mb-4">Apakah combo <span id="modal-combo" class="mono text-pink-400 font-bold"></span> berhasil login?</p>
+            <p class="text-[8px] text-gray-500 mb-3">*Ini hanya tracking pribadi, bukan verifikasi resmi</p>
             <div class="flex gap-3">
                 <button onclick="confirmSuccess()" class="flex-1 success-gradient py-3 rounded-xl font-bold text-black hover:scale-105 transition-all">
                     <i class="fas fa-check-circle mr-2"></i> BISA LOGIN
@@ -483,7 +579,7 @@
 
     <script>
         // ==================== LOCAL STORAGE KEY ====================
-        const STORAGE_KEY = 'xrezzky_checker_data_v40';
+        const STORAGE_KEY = 'xrezzky_checker_data_v41';
         
         // ==================== DATA STORE ====================
         let users = [];
@@ -494,6 +590,10 @@
         // Slider state
         let currentIndex = 0;
         let currentFilter = 'all'; // all, success, failed, pending
+        
+        // Copy timer state
+        let copyTimer = null;
+        let isCopying = false;
         
         // Status tracking
         const statusColors = {
@@ -690,7 +790,7 @@
             }
         }
 
-        // ==================== CLEAR ALL DATA (SATU TOMBOL) ====================
+                // ==================== CLEAR ALL DATA ====================
         function clearAllData() {
             if (confirm('⚠️ Yakin mau hapus SEMUA data?\n\n- Input users & passwords\n- Semua hasil analisis\n- Status login\n- Data tersimpan di device ini')) {
                 
@@ -824,8 +924,7 @@
             document.getElementById('selected-user-display').innerText = '-';
             document.getElementById('current-user-display').innerText = '-';
             document.getElementById('current-pass-display').innerText = '-';
-
-                        document.getElementById('password-slider').style.display = 'none';
+            document.getElementById('password-slider').style.display = 'none';
             document.getElementById('no-password-selected').style.display = 'block';
             document.getElementById('prev-btn').disabled = true;
             document.getElementById('next-btn').disabled = true;
@@ -1085,8 +1184,8 @@
             }
         }
 
-        // ==================== COPY & CONFIRM ====================
-        function copyCurrentPassword() {
+        // ==================== COPY BERTAHAP (5 DETIK) ====================
+        function startDelayedCopy() {
             if (!selectedUser) {
                 showToast('PILIH USER DULU!', 1500);
                 return;
@@ -1095,32 +1194,90 @@
             const userMatches = getFilteredMatchesForUser(selectedUser);
             if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
 
+            // Cek apakah sedang dalam proses copy
+            if (isCopying) {
+                showToast('⏳ Sedang dalam proses copy, tunggu!', 1500);
+                return;
+            }
+
             const current = userMatches[currentIndex];
-            const combo = `${current.user}:${current.password}`;
             
-            // Copy ke clipboard
-            navigator.clipboard.writeText(combo).then(() => {
-                showToast(`✅ COPIED: ${combo}`, 1500);
+            // Reset timer bar
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.animation = 'none';
+            timerBar.offsetHeight; // Trigger reflow
+            timerBar.style.animation = 'countdown 5s linear forwards';
+            
+            // Tampilkan status copy
+            document.getElementById('copy-status-container').style.display = 'block';
+            document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-user"></i> Menyalin USER: ${current.user}`;
+            
+            // Disable tombol copy selama proses
+            document.getElementById('copy-current-btn').disabled = true;
+            document.getElementById('copy-current-btn').classList.add('opacity-50', 'cursor-not-allowed');
+            
+            isCopying = true;
+            
+            // STEP 1: Copy USER dulu
+            navigator.clipboard.writeText(current.user).then(() => {
+                showToast(`✅ USER COPIED: ${current.user}`, 1000);
                 
-                // Tandai card sebagai copied (tapi status tetap pending)
-                const slider = document.getElementById('password-slider');
-                const cards = slider.children;
-                if (cards.length > currentIndex) {
-                    cards[currentIndex].classList.add('copied');
-                    setTimeout(() => {
-                        cards[currentIndex].classList.remove('copied');
-                    }, 2000);
-                }
+                // Update status
+                document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-hourglass-half"></i> Tunggu 5 detik sebelum copy password...`;
                 
-                // Tampilkan modal konfirmasi
-                showConfirmModal(current);
-                
-                // Auto open roblox jika di checklist
+                // Auto open roblox setelah copy user
                 if (document.getElementById('auto-open').checked) {
                     window.open('https://www.roblox.com/login', '_blank');
                 }
+                
+                // STEP 2: Timer 5 detik
+                copyTimer = setTimeout(() => {
+                    // Copy password
+                    navigator.clipboard.writeText(current.password).then(() => {
+                        showToast(`✅ PASSWORD COPIED: ${current.password}`, 1500);
+                        
+                        // Update status
+                        document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-check-circle text-green-400"></i> Selesai! Menampilkan konfirmasi...`;
+                        
+                        // Sembunyikan status copy setelah 1 detik
+                        setTimeout(() => {
+                            document.getElementById('copy-status-container').style.display = 'none';
+                        }, 1000);
+                        
+                        // Tampilkan modal konfirmasi
+                        showConfirmModal(current);
+                        
+                        // Tandai card sebagai copied
+                        const slider = document.getElementById('password-slider');
+                        const cards = slider.children;
+                        if (cards.length > currentIndex) {
+                            cards[currentIndex].classList.add('copied');
+                            setTimeout(() => {
+                                cards[currentIndex].classList.remove('copied');
+                            }, 2000);
+                        }
+                        
+                        // Reset state
+                        document.getElementById('copy-current-btn').disabled = false;
+                        document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+                        isCopying = false;
+                        
+                    }).catch(err => {
+                        showToast('❌ GAGAL COPY PASSWORD!', 1500);
+                        document.getElementById('copy-status-container').style.display = 'none';
+                        document.getElementById('copy-current-btn').disabled = false;
+                        document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+                        isCopying = false;
+                    });
+                    
+                }, 5000); // 5 detik
+                
             }).catch(err => {
-                showToast('❌ GAGAL COPY!', 1500);
+                showToast('❌ GAGAL COPY USER!', 1500);
+                document.getElementById('copy-status-container').style.display = 'none';
+                document.getElementById('copy-current-btn').disabled = false;
+                document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+                isCopying = false;
             });
         }
 
@@ -1384,13 +1541,13 @@
             const pending = matches.filter(m => m.status === 'pending').length;
             
             // Hitung rata-rata score
-            const avgScore = Math.round(matches.reduce((sum, m) => sum + m.score, 0) / matches.length);
+            const avgScore = matches.length > 0 ? Math.round(matches.reduce((sum, m) => sum + m.score, 0) / matches.length) : 0;
             
             // Buat laporan
             const report = `
 ═══════════════════════════
-   XREZZKY Ω-CHECKER v40.0
-   SUPER AKURAT EDITION
+   XREZZKY Ω-CHECKER v41.0
+   COPY BERTAHAP EDITION
 ═══════════════════════════
 
 📊 HASIL ANALISIS:
@@ -1419,6 +1576,12 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} 
 ━━━━━━━━━━━━━━━━━━━
 💾 DATA TERSIMPAN LOKAL
 ⏰ ${new Date().toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━━
+⚠️ DISCLAIMER:
+Kami hanya mengecek kecocokan pola username & password.
+Jika tidak akurat dengan akun asli, itu bukan urusan kami.
+Web khusus PG - Password Generator/Checker.
             `;
             
             // Tampilkan di console
@@ -1430,7 +1593,7 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} 
             });
             
             // Alert ringkas
-            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n📋 Detail sudah di clipboard!`);
+            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n📋 Detail sudah di clipboard!\n\n⚠️ Disclaimer: Kami hanya mengecek kecocokan, ketidakakuratan bukan urusan kami.`);
         }
 
         // ==================== INIT ====================
@@ -1447,7 +1610,7 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} 
             if (!hasData) {
                 // Kosong total, ga ada contoh
                 updateCounts();
-                showToast('🟢 XREZZKY V40.0 READY - SUPER AKURAT CHECKER', 2000);
+                showToast('🟢 XREZZKY V41.0 READY - COPY BERTAHAP 5 DETIK', 2000);
             } else {
                 showToast('🟢 Data dimuat dari penyimpanan lokal', 2000);
             }
