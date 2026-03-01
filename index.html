@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V38.0</title>
+    <title>XREZZKY Ω-CHECKER V39.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -201,6 +201,14 @@
             background: #ff0055;
             color: white;
         }
+        
+        .storage-indicator {
+            font-size: 8px;
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
@@ -210,11 +218,19 @@
             <h1 class="mono text-2xl md:text-4xl font-bold tracking-tighter italic">
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
-            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest">V38.0 - LOGIN CONFIRMATION</p>
+            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest flex items-center gap-2">
+                V39.0 - LOCAL STORAGE 
+                <span class="storage-indicator">
+                    <i class="fas fa-database"></i> Auto-save aktif
+                </span>
+            </p>
         </div>
         <div class="flex gap-2">
             <button onclick="clearAll()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all">
                 <i class="fas fa-trash-alt mr-2"></i> CLEAR ALL
+            </button>
+            <button onclick="clearLocalStorage()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all text-red-400 border border-red-500/30">
+                <i class="fas fa-database mr-2"></i> HAPUS DATA LOKAL
             </button>
             <button onclick="showResults()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all border border-purple-500/50">
                 <i class="fas fa-chart-bar mr-2"></i> HASIL
@@ -238,10 +254,7 @@
                             <label class="text-[10px] mono text-gray-400">USERNAMES</label>
                             <span id="user-count" class="text-[10px] text-purple-400 mono">0</span>
                         </div>
-                        <textarea id="user-input" rows="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-purple-500/50 mono text-sm custom-scrollbar" placeholder="user1&#10;user2">daniel
-justin
-robert
-robe</textarea>
+                        <textarea id="user-input" rows="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-purple-500/50 mono text-sm custom-scrollbar" placeholder="user1&#10;user2"></textarea>
                     </div>
 
                     <!-- PASSWORD INPUT -->
@@ -250,7 +263,7 @@ robe</textarea>
                             <label class="text-[10px] mono text-gray-400">PASSWORDS</label>
                             <span id="pass-count" class="text-[10px] text-pink-400 mono">0</span>
                         </div>
-                        <textarea id="pass-input" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2">'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'</textarea>
+                        <textarea id="pass-input" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2"></textarea>
                     </div>
 
                     <!-- MATCH THRESHOLD -->
@@ -264,7 +277,7 @@ robe</textarea>
                         </div>
                     </div>
 
-                    <!-- PROCESS BUTTON (PINDAH KE BAWAH) -->
+                    <!-- PROCESS BUTTON -->
                     <button onclick="processData()" class="w-full accent-gradient py-4 rounded-2xl font-bold text-white shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-95 transition-all mt-2">
                         <i class="fas fa-bolt mr-2"></i> PROCESS DATA
                     </button>
@@ -276,6 +289,12 @@ robe</textarea>
                         </span>
                         <input type="checkbox" id="auto-open" class="accent-pink-600" checked>
                     </label>
+
+                    <!-- STORAGE INFO -->
+                    <div class="text-[8px] text-gray-600 flex justify-between items-center border-t border-white/5 pt-2 mt-2">
+                        <span><i class="fas fa-save mr-1"></i> Auto-save setiap perubahan</span>
+                        <span id="last-saved" class="text-green-500/50">-</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,7 +318,7 @@ robe</textarea>
                 </div>
                 
                 <div id="user-list" class="flex flex-wrap gap-2 min-h-[60px] max-h-[120px] overflow-y-auto custom-scrollbar p-2">
-                    <div class="text-gray-600 text-sm w-full text-center">Belum ada user. Klik PROCESS!</div>
+                    <div class="text-gray-600 text-sm w-full text-center">Loading data...</div>
                 </div>
             </div>
 
@@ -410,6 +429,9 @@ robe</textarea>
     </div>
 
     <script>
+        // ==================== LOCAL STORAGE KEY ====================
+        const STORAGE_KEY = 'xrezzky_checker_data';
+        
         // ==================== DATA STORE ====================
         let users = [];
         let passwords = [];
@@ -426,6 +448,83 @@ robe</textarea>
             success: 'text-green-400',
             failed: 'text-red-400'
         };
+
+        // ==================== LOCAL STORAGE FUNCTIONS ====================
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    users: users,
+                    passwords: passwords,
+                    matches: matches,
+                    selectedUser: selectedUser,
+                    currentFilter: currentFilter,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                
+                // Update last saved indicator
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                document.getElementById('last-saved').innerText = `Terakhir: ${timeStr}`;
+                
+                return true;
+            } catch (e) {
+                console.error('Gagal save ke localStorage:', e);
+                return false;
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) return false;
+                
+                const data = JSON.parse(saved);
+                
+                // Load data
+                users = data.users || [];
+                passwords = data.passwords || [];
+                matches = data.matches || [];
+                selectedUser = data.selectedUser || null;
+                currentFilter = data.currentFilter || 'all';
+                
+                // Update UI
+                document.getElementById('user-input').value = users.join('\n');
+                document.getElementById('pass-input').value = passwords.map(p => `'${p}'`).join(',\n');
+                
+                updateCounts();
+                updateUserList();
+                updateFilterButtons();
+                
+                if (selectedUser) {
+                    selectUser(selectedUser);
+                }
+                
+                // Update last saved indicator
+                if (data.timestamp) {
+                    const savedTime = new Date(data.timestamp);
+                    const timeStr = savedTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('last-saved').innerText = `Dimuat: ${timeStr}`;
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Gagal load dari localStorage:', e);
+                return false;
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Yakin mau hapus semua data lokal di device ini?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                showToast('🗑️ Data lokal dihapus', 1500);
+                
+                // Reset ke default
+                setTimeout(() => {
+                    clearAll();
+                }, 500);
+            }
+        }
 
         // ==================== UTILITY FUNCTIONS ====================
         function showToast(msg, duration = 2000) {
@@ -515,7 +614,7 @@ robe</textarea>
                             user, 
                             password, 
                             score,
-                            status: 'pending' // pending, success, failed
+                            status: 'pending'
                         });
                     }
                 });
@@ -526,6 +625,9 @@ robe</textarea>
                 if (a.user === b.user) return b.score - a.score;
                 return a.user.localeCompare(b.user);
             });
+
+            // Save ke localStorage
+            saveToLocalStorage();
 
             // Update UI
             updateUserList();
@@ -621,6 +723,9 @@ robe</textarea>
                 updateCurrentDisplay(userMatches);
                 updateNavButtons(userMatches.length);
                 updateStatusCounts(user);
+                
+                // Save selection ke storage
+                saveToLocalStorage();
             } else {
                 document.getElementById('password-slider').style.display = 'none';
                 document.getElementById('no-password-selected').style.display = 'block';
@@ -706,7 +811,7 @@ robe</textarea>
                 document.getElementById('password-counter').innerText = `${currentIndex + 1}/${userMatches.length}`;
                 
                 // Tampilkan/sembunyikan tombol konfirmasi berdasarkan status
-                if (current.status === 'pending') {
+                                if (current.status === 'pending') {
                     document.getElementById('success-btn').style.display = 'block';
                     document.getElementById('failed-btn').style.display = 'block';
                 } else {
@@ -744,6 +849,9 @@ robe</textarea>
                 if (cards.length > index) {
                     cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                 }
+                
+                // Save state
+                saveToLocalStorage();
             }
         }
 
@@ -761,6 +869,8 @@ robe</textarea>
                 if (cards.length > currentIndex) {
                     cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                 }
+                
+                saveToLocalStorage();
             }
         }
 
@@ -778,10 +888,12 @@ robe</textarea>
                 if (cards.length > currentIndex) {
                     cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                 }
+                
+                saveToLocalStorage();
             }
         }
 
-                // ==================== COPY & CONFIRM ====================
+        // ==================== COPY & CONFIRM ====================
         function copyCurrentPassword() {
             if (!selectedUser) {
                 showToast('PILIH USER DULU!', 1500);
@@ -850,6 +962,9 @@ robe</textarea>
                 showToast('✅ Ditandai sebagai BERHASIL LOGIN!', 1500);
                 closeModal();
                 
+                // Save ke storage
+                saveToLocalStorage();
+                
                 // Refresh UI
                 if (selectedUser) {
                     updateStatusCounts(selectedUser);
@@ -860,6 +975,11 @@ robe</textarea>
                     if (userMatches.length > 0) {
                         renderPasswordSlider(userMatches);
                         updateCurrentDisplay(userMatches);
+                        
+                        // Auto lanjut ke next
+                        setTimeout(() => {
+                            slideNext();
+                        }, 300);
                     } else {
                         // Kalau ga ada hasil dengan filter ini, reset ke filter all
                         if (currentFilter !== 'all') {
@@ -887,6 +1007,9 @@ robe</textarea>
                 showToast('❌ Ditandai sebagai TIDAK COCOK', 1500);
                 closeModal();
                 
+                // Save ke storage
+                saveToLocalStorage();
+                
                 // Refresh UI
                 if (selectedUser) {
                     updateStatusCounts(selectedUser);
@@ -897,6 +1020,11 @@ robe</textarea>
                     if (userMatches.length > 0) {
                         renderPasswordSlider(userMatches);
                         updateCurrentDisplay(userMatches);
+                        
+                        // Auto lanjut ke next
+                        setTimeout(() => {
+                            slideNext();
+                        }, 300);
                     } else {
                         // Kalau ga ada hasil dengan filter ini, reset ke filter all
                         if (currentFilter !== 'all') {
@@ -919,6 +1047,9 @@ robe</textarea>
                 btn.classList.remove('active');
             });
             document.getElementById(`filter-${filter}`).classList.add('active');
+            
+            // Save filter ke storage
+            saveToLocalStorage();
             
             // Kalau ada user yang dipilih, refresh tampilan
             if (selectedUser) {
@@ -976,12 +1107,30 @@ robe</textarea>
             
             showToast('✅ Ditandai BERHASIL!', 1000);
             
+            // Save ke storage
+            saveToLocalStorage();
+            
             // Refresh
             updateStatusCounts(selectedUser);
             updateUserList();
             
-            // Lanjut ke next password
-            slideNext();
+            // Refresh slider
+            const newUserMatches = getFilteredMatchesForUser(selectedUser);
+            if (newUserMatches.length > 0) {
+                renderPasswordSlider(newUserMatches);
+                
+                // Kalau current index masih valid, stay di situ, kalau tidak ke 0
+                if (currentIndex >= newUserMatches.length) {
+                    currentIndex = 0;
+                }
+                updateCurrentDisplay(newUserMatches);
+                updateNavButtons(newUserMatches.length);
+            } else {
+                // Kalau ga ada hasil, reset filter
+                if (currentFilter !== 'all') {
+                    filterResults('all');
+                }
+            }
         }
 
         function markAsFailed() {
@@ -1003,12 +1152,30 @@ robe</textarea>
             
             showToast('❌ Ditandai GAGAL', 1000);
             
+            // Save ke storage
+            saveToLocalStorage();
+            
             // Refresh
             updateStatusCounts(selectedUser);
             updateUserList();
             
-            // Lanjut ke next password
-            slideNext();
+            // Refresh slider
+            const newUserMatches = getFilteredMatchesForUser(selectedUser);
+            if (newUserMatches.length > 0) {
+                renderPasswordSlider(newUserMatches);
+                
+                // Kalau current index masih valid, stay di situ, kalau tidak ke 0
+                if (currentIndex >= newUserMatches.length) {
+                    currentIndex = 0;
+                }
+                updateCurrentDisplay(newUserMatches);
+                updateNavButtons(newUserMatches.length);
+            } else {
+                // Kalau ga ada hasil, reset filter
+                if (currentFilter !== 'all') {
+                    filterResults('all');
+                }
+            }
         }
 
         // ==================== SHOW RESULTS ====================
@@ -1027,7 +1194,7 @@ robe</textarea>
             // Buat laporan
             const report = `
 ═══════════════════════════
-   XREZZKY Ω-CHECKER v38.0
+   XREZZKY Ω-CHECKER v39.0
 ═══════════════════════════
 
 📊 HASIL ANALISIS:
@@ -1052,6 +1219,7 @@ ${users.map(user => {
 ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━
+💾 DATA TERSIMPAN LOKAL
 ⏰ ${new Date().toLocaleString()}
             `;
             
@@ -1063,8 +1231,8 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`
                 showToast('📋 Laporan hasil dicopy ke clipboard!', 2000);
             });
             
-            // Bisa juga ditampilkan di alert (tapi kepanjangan)
-            alert(`HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n\nDetail sudah di console & clipboard!`);
+            // Alert ringkas
+            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n\n📋 Detail sudah di clipboard!`);
         }
 
         // ==================== CLEAR ALL ====================
@@ -1101,9 +1269,25 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`
                 selectedUser = null;
                 currentIndex = 0;
                 
+                // Hapus dari localStorage juga
+                localStorage.removeItem(STORAGE_KEY);
+                document.getElementById('last-saved').innerText = '-';
+                
                 updateCounts();
                 showToast('🧹 SEMUA DIHAPUS', 1500);
             }
+        }
+
+        // ==================== AUTO-SAVE TRIGGERS ====================
+        function setupAutoSave() {
+            // Simpan setiap kali ada perubahan status
+            const originalConfirmSuccess = confirmSuccess;
+            const originalConfirmFailed = confirmFailed;
+            const originalMarkAsSuccess = markAsSuccess;
+            const originalMarkAsFailed = markAsFailed;
+            
+            // Override functions sudah termasuk save
+            // Tambahin auto save untuk navigasi
         }
 
         // ==================== INIT ====================
@@ -1113,14 +1297,30 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`
         // Auto-update threshold label
         updateThresholdLabel();
 
-        // Auto process on load
+        // Load data dari localStorage saat startup
         window.onload = function() {
-            setTimeout(() => {
-                processData();
-                updateCounts();
-                updateFilterButtons();
-            }, 500);
+            const hasData = loadFromLocalStorage();
+            
+            if (!hasData) {
+                // Kalau ga ada data, kasih contoh
+                document.getElementById('user-input').value = 'daniel\njustin\nrobert\nrobe';
+                document.getElementById('pass-input').value = `'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'`;
+                
+                setTimeout(() => {
+                    processData();
+                }, 500);
+            }
+            
+            updateCounts();
+            updateFilterButtons();
+            
+            showToast('🟢 SYSTEM READY - Data tersimpan lokal', 2000);
         };
+
+        // Simpan data sebelum user meninggalkan halaman
+        window.addEventListener('beforeunload', function() {
+            saveToLocalStorage();
+        });
     </script>
 </body>
 </html>
