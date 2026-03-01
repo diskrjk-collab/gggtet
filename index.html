@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V41.0</title>
+    <title>XREZZKY Ω-CHECKER V42.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -39,6 +39,16 @@
         /* AKURAT BADGE */
         .akurat-badge {
             background: linear-gradient(135deg, #ffaa00 0%, #ff5500 100%);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: bold;
+            color: black;
+        }
+        
+        /* INSTANT BADGE */
+        .instant-badge {
+            background: linear-gradient(135deg, #00ffaa 0%, #00cc88 100%);
             padding: 2px 8px;
             border-radius: 20px;
             font-size: 8px;
@@ -271,24 +281,13 @@
             opacity: 1;
         }
         
-        /* TIMER ANIMATION */
-        @keyframes countdown {
-            0% { width: 100%; }
-            100% { width: 0%; }
-        }
-        
-        .timer-bar {
-            height: 3px;
-            background: linear-gradient(90deg, #ff0055, #7000ff);
-            animation: countdown 5s linear forwards;
-        }
-        
+        /* COPY STATUS */
         .copy-status {
             font-size: 10px;
             padding: 4px 8px;
             border-radius: 20px;
-            background: rgba(255, 0, 85, 0.2);
-            border: 1px solid #ff0055;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -313,8 +312,8 @@
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
             <p class="text-gray-500 mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                V41.0 - COPY BERTAHAP 
-                <span class="akurat-badge">USER → 5s → PASS</span>
+                V42.0 - INSTANT COPY 
+                <span class="instant-badge">USER → LANGSUNG → PASS</span>
                 <span class="storage-indicator">
                     <i class="fas fa-database"></i> Auto-save
                 </span>
@@ -408,6 +407,7 @@
                             <li><strong>Data tersimpan</strong> di device kamu sendiri (local storage).</li>
                             <li><strong>Akurasi berdasarkan:</strong> kemiripan huruf (min 3), angka (min 3), prefix, suffix, substring.</li>
                             <li><strong>Status login</strong> hanya untuk tracking pribadi, bukan verifikasi resmi.</li>
+                            <li><strong>INSTANT COPY:</strong> Sekali klik, langsung copy USER lalu LANGSUNG copy PASSWORD (tanpa jeda).</li>
                         </ul>
                         <div class="mt-2 text-[8px] text-gray-600 border-t border-white/5 pt-2">
                             ⚠️ Penggunaan di luar tanggung jawab pengguna. Kami hanya menyediakan alat bantu analisis.
@@ -479,10 +479,7 @@
                 <!-- COPY STATUS INDICATOR -->
                 <div id="copy-status-container" class="px-5 pt-2" style="display: none;">
                     <div class="copy-status">
-                        <i class="fas fa-clock"></i> <span id="copy-status-text">Menyalin user...</span>
-                    </div>
-                    <div class="w-full bg-white/10 rounded-full mt-1 overflow-hidden">
-                        <div id="timer-bar" class="timer-bar"></div>
+                        <i class="fas fa-bolt text-green-400"></i> <span id="copy-status-text">Menyalin user...</span>
                     </div>
                 </div>
 
@@ -513,8 +510,8 @@
                                 <span id="current-pass-display" class="mono text-sm text-pink-400">-</span>
                             </div>
                             <div class="flex gap-2">
-                                <button id="copy-current-btn" onclick="startDelayedCopy()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fas fa-copy"></i> COPY (5s)
+                                <button id="copy-current-btn" onclick="startInstantCopy()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fas fa-bolt"></i> INSTANT COPY
                                 </button>
                                 <button id="success-btn" onclick="markAsSuccess()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition-all" style="display: none;">
                                     <i class="fas fa-check"></i> BISA LOGIN
@@ -530,8 +527,8 @@
 
             <!-- INFO PANEL KECIL DI BAWAH RESULTS -->
             <div class="glass p-3 rounded-xl text-[8px] text-gray-500 flex items-center gap-2">
-                <i class="fas fa-shield-alt text-pink-500"></i>
-                <span>Web ini khusus PG (Password Generator/Checker) - Kami hanya mengecek kecocokan pola, bukan menjamin akun. Ketidakakuratan bukan urusan kami.</span>
+                <i class="fas fa-bolt text-green-400"></i>
+                <span>INSTANT COPY: Sekali klik langsung copy USER lalu LANGSUNG copy PASSWORD (tanpa jeda).</span>
             </div>
         </div>
     </div>
@@ -539,7 +536,7 @@
     <!-- FOOTER DENGAN DISCLAIMER LENGKAP -->
     <div class="footer max-w-7xl mx-auto w-full mt-8">
         <div class="text-[8px] text-gray-700 space-y-1">
-            <p>© 2025 XREZZKY Ω-CHECKER v41.0 - SUPER AKURAT EDITION</p>
+            <p>© 2026 XREZZKY Ω-CHECKER v42.0 - INSTANT COPY EDITION</p>
             <p class="flex items-center justify-center gap-2">
                 <span class="w-1 h-1 bg-pink-500 rounded-full"></span>
                 <span>SISTEM INI HANYA UNTUK PENGECEKAN KECOCOKAN USER & PASSWORD</span>
@@ -579,7 +576,7 @@
 
     <script>
         // ==================== LOCAL STORAGE KEY ====================
-        const STORAGE_KEY = 'xrezzky_checker_data_v41';
+        const STORAGE_KEY = 'xrezzky_checker_data_v42';
         
         // ==================== DATA STORE ====================
         let users = [];
@@ -591,8 +588,7 @@
         let currentIndex = 0;
         let currentFilter = 'all'; // all, success, failed, pending
         
-        // Copy timer state
-        let copyTimer = null;
+        // Copy state
         let isCopying = false;
         
         // Status tracking
@@ -790,8 +786,9 @@
             }
         }
 
-                // ==================== CLEAR ALL DATA ====================
-        function clearAllData() {
+        // ==================== CLEAR ALL DATA =======================
+
+                function clearAllData() {
             if (confirm('⚠️ Yakin mau hapus SEMUA data?\n\n- Input users & passwords\n- Semua hasil analisis\n- Status login\n- Data tersimpan di device ini')) {
                 
                 // Kosongin input
@@ -1184,8 +1181,8 @@
             }
         }
 
-        // ==================== COPY BERTAHAP (5 DETIK) ====================
-        function startDelayedCopy() {
+        // ==================== INSTANT COPY (TANPA JEDA) ====================
+        function startInstantCopy() {
             if (!selectedUser) {
                 showToast('PILIH USER DULU!', 1500);
                 return;
@@ -1202,12 +1199,6 @@
 
             const current = userMatches[currentIndex];
             
-            // Reset timer bar
-            const timerBar = document.getElementById('timer-bar');
-            timerBar.style.animation = 'none';
-            timerBar.offsetHeight; // Trigger reflow
-            timerBar.style.animation = 'countdown 5s linear forwards';
-            
             // Tampilkan status copy
             document.getElementById('copy-status-container').style.display = 'block';
             document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-user"></i> Menyalin USER: ${current.user}`;
@@ -1223,16 +1214,15 @@
                 showToast(`✅ USER COPIED: ${current.user}`, 1000);
                 
                 // Update status
-                document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-hourglass-half"></i> Tunggu 5 detik sebelum copy password...`;
+                document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-key"></i> Menyalin PASSWORD...`;
                 
                 // Auto open roblox setelah copy user
                 if (document.getElementById('auto-open').checked) {
                     window.open('https://www.roblox.com/login', '_blank');
                 }
                 
-                // STEP 2: Timer 5 detik
-                copyTimer = setTimeout(() => {
-                    // Copy password
+                // STEP 2: Langsung copy password TANPA JEDA
+                setTimeout(() => {
                     navigator.clipboard.writeText(current.password).then(() => {
                         showToast(`✅ PASSWORD COPIED: ${current.password}`, 1500);
                         
@@ -1269,8 +1259,7 @@
                         document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
                         isCopying = false;
                     });
-                    
-                }, 5000); // 5 detik
+                }, 100); // Kasih delay 100ms biar ga kecepatan (tapi hampir instant)
                 
             }).catch(err => {
                 showToast('❌ GAGAL COPY USER!', 1500);
@@ -1546,8 +1535,8 @@
             // Buat laporan
             const report = `
 ═══════════════════════════
-   XREZZKY Ω-CHECKER v41.0
-   COPY BERTAHAP EDITION
+   XREZZKY Ω-CHECKER v42.0
+   INSTANT COPY EDITION
 ═══════════════════════════
 
 📊 HASIL ANALISIS:
@@ -1574,6 +1563,7 @@ ${users.map(user => {
 ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} [${m.score}%]`).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━
+⚡ INSTANT COPY: USER → LANGSUNG → PASSWORD (tanpa jeda)
 💾 DATA TERSIMPAN LOKAL
 ⏰ ${new Date().toLocaleString()}
 
@@ -1593,7 +1583,7 @@ Web khusus PG - Password Generator/Checker.
             });
             
             // Alert ringkas
-            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n📋 Detail sudah di clipboard!\n\n⚠️ Disclaimer: Kami hanya mengecek kecocokan, ketidakakuratan bukan urusan kami.`);
+            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n⚡ INSTANT COPY: USER langsung PASSWORD\n\n📋 Detail sudah di clipboard!\n\n⚠️ Disclaimer: Kami hanya mengecek kecocokan, ketidakakuratan bukan urusan kami.`);
         }
 
         // ==================== INIT ====================
@@ -1610,7 +1600,7 @@ Web khusus PG - Password Generator/Checker.
             if (!hasData) {
                 // Kosong total, ga ada contoh
                 updateCounts();
-                showToast('🟢 XREZZKY V41.0 READY - COPY BERTAHAP 5 DETIK', 2000);
+                showToast('🟢 XREZZKY V42.0 READY - INSTANT COPY', 2000);
             } else {
                 showToast('🟢 Data dimuat dari penyimpanan lokal', 2000);
             }
