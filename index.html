@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V39.0</title>
+    <title>XREZZKY Ω-CHECKER V40.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -35,6 +35,17 @@
         .failed-gradient {
             background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
         }
+        
+        /* AKURAT BADGE */
+        .akurat-badge {
+            background: linear-gradient(135deg, #ffaa00 0%, #ff5500 100%);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 8px;
+            font-weight: bold;
+            color: black;
+        }
+        
         .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
@@ -209,6 +220,43 @@
             align-items: center;
             gap: 4px;
         }
+        
+        .clear-btn {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            transition: all 0.2s ease;
+        }
+        .clear-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+        
+        /* TOOLTIP */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 10px;
+            border: 1px solid #ff0055;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
@@ -219,18 +267,17 @@
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
             <p class="text-gray-500 mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                V39.0 - LOCAL STORAGE 
+                V40.0 - SUPER AKURAT 
+                <span class="akurat-badge">3-4 HURUF/ANGKA SAMA</span>
                 <span class="storage-indicator">
-                    <i class="fas fa-database"></i> Auto-save aktif
+                    <i class="fas fa-database"></i> Auto-save
                 </span>
             </p>
         </div>
         <div class="flex gap-2">
-            <button onclick="clearAll()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all">
-                <i class="fas fa-trash-alt mr-2"></i> CLEAR ALL
-            </button>
-            <button onclick="clearLocalStorage()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all text-red-400 border border-red-500/30">
-                <i class="fas fa-database mr-2"></i> HAPUS DATA LOKAL
+            <!-- SATU TOMBOL CLEAR UNTUK SEMUA -->
+            <button onclick="clearAllData()" class="clear-btn px-4 py-2 rounded-xl text-xs font-bold text-white hover:scale-105 transition-all flex items-center gap-2">
+                <i class="fas fa-trash-alt mr-1"></i> CLEAR ALL DATA
             </button>
             <button onclick="showResults()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all border border-purple-500/50">
                 <i class="fas fa-chart-bar mr-2"></i> HASIL
@@ -248,7 +295,7 @@
                 </h2>
                 
                 <div class="space-y-4">
-                    <!-- USER INPUT -->
+                    <!-- USER INPUT - KOSONG -->
                     <div>
                         <div class="flex justify-between mb-1">
                             <label class="text-[10px] mono text-gray-400">USERNAMES</label>
@@ -257,7 +304,7 @@
                         <textarea id="user-input" rows="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-purple-500/50 mono text-sm custom-scrollbar" placeholder="user1&#10;user2"></textarea>
                     </div>
 
-                    <!-- PASSWORD INPUT -->
+                    <!-- PASSWORD INPUT - KOSONG -->
                     <div>
                         <div class="flex justify-between mb-1">
                             <label class="text-[10px] mono text-gray-400">PASSWORDS</label>
@@ -266,9 +313,15 @@
                         <textarea id="pass-input" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2"></textarea>
                     </div>
 
-                    <!-- MATCH THRESHOLD -->
+                    <!-- MATCH THRESHOLD - TETAP 30% -->
                     <div class="glass-dark p-4 rounded-2xl">
-                        <label class="text-xs text-gray-400 block mb-2">MINIMUM MATCH SCORE</label>
+                        <label class="text-xs text-gray-400 block mb-2 flex items-center gap-2">
+                            MINIMUM MATCH SCORE
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle text-[10px] text-gray-500"></i>
+                                <span class="tooltiptext">Skor dihitung dari kemiripan huruf/angka dimanapun posisinya</span>
+                            </span>
+                        </label>
                         <input type="range" id="match-threshold" min="0" max="100" value="30" class="w-full accent-pink-600" oninput="updateThresholdLabel()">
                         <div class="flex justify-between mt-1">
                             <span class="text-[10px] text-gray-600">0%</span>
@@ -318,7 +371,7 @@
                 </div>
                 
                 <div id="user-list" class="flex flex-wrap gap-2 min-h-[60px] max-h-[120px] overflow-y-auto custom-scrollbar p-2">
-                    <div class="text-gray-600 text-sm w-full text-center">Loading data...</div>
+                    <div class="text-gray-600 text-sm w-full text-center">Belum ada data. Isi username & password lalu PROCESS!</div>
                 </div>
             </div>
 
@@ -430,7 +483,7 @@
 
     <script>
         // ==================== LOCAL STORAGE KEY ====================
-        const STORAGE_KEY = 'xrezzky_checker_data';
+        const STORAGE_KEY = 'xrezzky_checker_data_v40';
         
         // ==================== DATA STORE ====================
         let users = [];
@@ -449,6 +502,127 @@
             failed: 'text-red-400'
         };
 
+        // ==================== SUPER AKURAT CHECKER ====================
+        function calculateAkuratScore(user, password) {
+            const u = user.toLowerCase().trim();
+            const p = password.toLowerCase().trim();
+            
+            // Kalo sama persis -> 100%
+            if (u === p) return 100;
+            
+            // Cek partial match (3-4 huruf/angka sama dimanapun)
+            
+            // 1. Cek huruf yang sama (case insensitive)
+            const uLetters = u.replace(/[0-9]/g, '');
+            const pLetters = p.replace(/[0-9]/g, '');
+            
+            // 2. Cek angka yang sama
+            const uNums = u.replace(/\D/g, '');
+            const pNums = p.replace(/\D/g, '');
+            
+            let score = 0;
+            let matchDetails = [];
+            
+            // HITUNG KEMIRIPAN HURUF
+            if (uLetters.length > 0 && pLetters.length > 0) {
+                // Cari huruf yang sama (urutan bebas)
+                let commonLetters = 0;
+                const uLetterSet = new Set(uLetters.split(''));
+                const pLetterSet = new Set(pLetters.split(''));
+                
+                // Intersection
+                uLetterSet.forEach(letter => {
+                    if (pLetterSet.has(letter)) {
+                        commonLetters++;
+                    }
+                });
+                
+                // Minimal 3 huruf sama atau 80% dari huruf terkecil
+                const minLetters = Math.min(uLetters.length, pLetters.length);
+                if (commonLetters >= 3 || (minLetters > 0 && commonLetters / minLetters >= 0.7)) {
+                    score += 40;
+                    matchDetails.push(`huruf:${commonLetters}`);
+                } else if (commonLetters >= 2) {
+                    score += 20;
+                    matchDetails.push(`huruf:${commonLetters}`);
+                }
+            }
+            
+            // HITUNG KEMIRIPAN ANGKA
+            if (uNums.length > 0 && pNums.length > 0) {
+                // Cari angka yang sama (urutan bebas)
+                let commonNums = 0;
+                const uNumSet = new Set(uNums.split(''));
+                const pNumSet = new Set(pNums.split(''));
+                
+                uNumSet.forEach(num => {
+                    if (pNumSet.has(num)) {
+                        commonNums++;
+                    }
+                });
+                
+                // Minimal 3 angka sama atau semua angka sama
+                if (commonNums >= 3 || uNums === pNums) {
+                    score += 40;
+                    matchDetails.push(`angka:${commonNums}`);
+                } else if (commonNums >= 2) {
+                    score += 20;
+                    matchDetails.push(`angka:${commonNums}`);
+                }
+            }
+            
+            // CEK APAKAH USER ADA DI DALAM PASSWORD (substring)
+            if (p.includes(u) || u.includes(p)) {
+                score += 30;
+                matchDetails.push('substring');
+            }
+            
+            // CEK AWALAN YANG SAMA (prefix)
+            let prefixLen = 0;
+            for (let i = 0; i < Math.min(u.length, p.length); i++) {
+                if (u[i] === p[i]) prefixLen++;
+                else break;
+            }
+            if (prefixLen >= 3) {
+                score += 20;
+                matchDetails.push(`prefix:${prefixLen}`);
+            } else if (prefixLen >= 2) {
+                score += 10;
+                matchDetails.push(`prefix:${prefixLen}`);
+            }
+            
+            // CEK AKHIRAN YANG SAMA (suffix)
+            let suffixLen = 0;
+            for (let i = 0; i < Math.min(u.length, p.length); i++) {
+                if (u[u.length - 1 - i] === p[p.length - 1 - i]) suffixLen++;
+                else break;
+            }
+            if (suffixLen >= 3) {
+                score += 20;
+                matchDetails.push(`suffix:${suffixLen}`);
+            } else if (suffixLen >= 2) {
+                score += 10;
+                matchDetails.push(`suffix:${suffixLen}`);
+            }
+            
+            // CEK POLA UMUM (nama + angka, angka + nama)
+            const uName = u.replace(/[0-9]/g, '');
+            const pName = p.replace(/[0-9]/g, '');
+            
+            if (uName && pName && uName === pName) {
+                score += 30;
+                matchDetails.push('nama-sama');
+            }
+            
+            // BATASI MAKSIMAL 100
+            const finalScore = Math.min(Math.round(score), 100);
+            
+            // Simpan detail untuk debugging
+            console.log(`${user}:${password} = ${finalScore}% [${matchDetails.join(', ')}]`);
+            
+            return finalScore;
+        }
+
         // ==================== LOCAL STORAGE FUNCTIONS ====================
         function saveToLocalStorage() {
             try {
@@ -458,6 +632,7 @@
                     matches: matches,
                     selectedUser: selectedUser,
                     currentFilter: currentFilter,
+                    currentIndex: currentIndex,
                     timestamp: new Date().toISOString()
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -487,10 +662,11 @@
                 matches = data.matches || [];
                 selectedUser = data.selectedUser || null;
                 currentFilter = data.currentFilter || 'all';
+                currentIndex = data.currentIndex || 0;
                 
                 // Update UI
                 document.getElementById('user-input').value = users.join('\n');
-                document.getElementById('pass-input').value = passwords.map(p => `'${p}'`).join(',\n');
+                document.getElementById('pass-input').value = passwords.join('\n');
                 
                 updateCounts();
                 updateUserList();
@@ -514,15 +690,51 @@
             }
         }
 
-        function clearLocalStorage() {
-            if (confirm('Yakin mau hapus semua data lokal di device ini?')) {
-                localStorage.removeItem(STORAGE_KEY);
-                showToast('🗑️ Data lokal dihapus', 1500);
+        // ==================== CLEAR ALL DATA (SATU TOMBOL) ====================
+        function clearAllData() {
+            if (confirm('⚠️ Yakin mau hapus SEMUA data?\n\n- Input users & passwords\n- Semua hasil analisis\n- Status login\n- Data tersimpan di device ini')) {
                 
-                // Reset ke default
-                setTimeout(() => {
-                    clearAll();
-                }, 500);
+                // Kosongin input
+                document.getElementById('user-input').value = '';
+                document.getElementById('pass-input').value = '';
+                
+                // Reset semua variable
+                users = [];
+                passwords = [];
+                matches = [];
+                selectedUser = null;
+                currentIndex = 0;
+                currentFilter = 'all';
+                
+                // Hapus dari localStorage
+                localStorage.removeItem(STORAGE_KEY);
+                
+                // Update UI
+                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada data. Isi username & password lalu PROCESS!</div>';
+                document.getElementById('selected-user-display').innerText = '-';
+                document.getElementById('current-user-display').innerText = '-';
+                document.getElementById('current-pass-display').innerText = '-';
+                document.getElementById('password-slider').style.display = 'none';
+                document.getElementById('no-password-selected').style.display = 'block';
+                document.getElementById('no-password-selected').innerHTML = `
+                    <i class="fas fa-arrow-left text-3xl mb-3"></i>
+                    <p class="text-sm">Pilih user dulu dari daftar di atas</p>
+                `;
+                document.getElementById('success-btn').style.display = 'none';
+                document.getElementById('failed-btn').style.display = 'none';
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('password-counter').innerText = '0/0';
+                document.getElementById('success-count').innerText = '0';
+                document.getElementById('failed-count').innerText = '0';
+                document.getElementById('pending-count').innerText = '0';
+                document.getElementById('last-saved').innerText = '-';
+                
+                // Reset filter buttons
+                updateFilterButtons();
+                
+                updateCounts();
+                showToast('🧹 SEMUA DATA DIHAPUS!', 2000);
             }
         }
 
@@ -563,34 +775,6 @@
             document.getElementById('threshold-value').innerText = val + '%';
         }
 
-        // ==================== SIMILARITY CALCULATION ====================
-        function calculateSimilarity(user, password) {
-            const u = user.toLowerCase();
-            const p = password.toLowerCase();
-            
-            if (u === p) return 100;
-            
-            let score = 0;
-            
-            if (p.includes(u) || u.includes(p)) score += 50;
-            
-            let prefixCount = 0;
-            for (let i = 0; i < Math.min(u.length, p.length); i++) {
-                if (u[i] === p[i]) prefixCount++;
-                else break;
-            }
-            score += (prefixCount * 5);
-            
-            const uNums = u.replace(/\D/g, '');
-            const pNums = p.replace(/\D/g, '');
-            if (uNums && pNums) {
-                if (uNums === pNums) score += 30;
-                else if (uNums.includes(pNums) || pNums.includes(uNums)) score += 15;
-            }
-            
-            return Math.min(Math.round(score), 100);
-        }
-
         // ==================== PROCESS DATA ====================
         function processData() {
             // Parse users
@@ -604,11 +788,11 @@
 
             const threshold = parseInt(document.getElementById('match-threshold').value);
 
-            // Hitung semua kemungkinan match
+            // Hitung semua kemungkinan match dengan SUPER AKURAT CHECKER
             matches = [];
             users.forEach(user => {
                 passwords.forEach(password => {
-                    const score = calculateSimilarity(user, password);
+                    const score = calculateAkuratScore(user, password);
                     if (score >= threshold) {
                         matches.push({ 
                             user, 
@@ -640,7 +824,8 @@
             document.getElementById('selected-user-display').innerText = '-';
             document.getElementById('current-user-display').innerText = '-';
             document.getElementById('current-pass-display').innerText = '-';
-            document.getElementById('password-slider').style.display = 'none';
+            document.getElementById('password-slider').style.display = '
+                        document.getElementById('password-slider').style.display = 'none';
             document.getElementById('no-password-selected').style.display = 'block';
             document.getElementById('prev-btn').disabled = true;
             document.getElementById('next-btn').disabled = true;
@@ -657,7 +842,7 @@
             container.innerHTML = '';
 
             if (users.length === 0) {
-                container.innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada user. Isi username dulu!</div>';
+                container.innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada data. Isi username & password lalu PROCESS!</div>';
                 return;
             }
 
@@ -767,14 +952,22 @@
                 card.setAttribute('data-password', match.password);
                 card.setAttribute('data-status', match.status);
                 
-                // Match badge color
+                // Match badge color based on score
                 let badgeClass = 'from-green-500 to-green-600';
                 if (match.score < 60) badgeClass = 'from-yellow-500 to-yellow-600';
                 if (match.score < 40) badgeClass = 'from-red-500 to-red-600';
                 
+                // Tambahin detail kecocokan
+                let matchDetail = '';
+                if (match.score >= 80) matchDetail = '🔴 SANGAT COCOK';
+                else if (match.score >= 60) matchDetail = '🟡 COCOK';
+                else if (match.score >= 40) matchDetail = '🟢 MUNGKIN';
+                else matchDetail = '⚪ RENDAH';
+                
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
-                        <span class="match-badge bg-gradient-to-r ${badgeClass}">${match.score}% match</span>
+                        <span class="match-badge bg-gradient-to-r ${badgeClass}">${match.score}%</span>
+                        <span class="text-[8px] text-gray-400">${matchDetail}</span>
                     </div>
                     <div class="mono text-sm mb-4 break-all min-h-[60px]">${match.password}</div>
                     <div class="flex justify-between items-center">
@@ -811,7 +1004,7 @@
                 document.getElementById('password-counter').innerText = `${currentIndex + 1}/${userMatches.length}`;
                 
                 // Tampilkan/sembunyikan tombol konfirmasi berdasarkan status
-                                if (current.status === 'pending') {
+                if (current.status === 'pending') {
                     document.getElementById('success-btn').style.display = 'block';
                     document.getElementById('failed-btn').style.display = 'block';
                 } else {
@@ -850,7 +1043,6 @@
                     cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
                 }
                 
-                // Save state
                 saveToLocalStorage();
             }
         }
@@ -1191,10 +1383,14 @@
             const failed = matches.filter(m => m.status === 'failed').length;
             const pending = matches.filter(m => m.status === 'pending').length;
             
+            // Hitung rata-rata score
+            const avgScore = Math.round(matches.reduce((sum, m) => sum + m.score, 0) / matches.length);
+            
             // Buat laporan
             const report = `
 ═══════════════════════════
-   XREZZKY Ω-CHECKER v39.0
+   XREZZKY Ω-CHECKER v40.0
+   SUPER AKURAT EDITION
 ═══════════════════════════
 
 📊 HASIL ANALISIS:
@@ -1203,6 +1399,7 @@
 ❌ TIDAK COCOK   : ${failed}
 ⏳ PENDING       : ${pending}
 📈 TOTAL         : ${total}
+🎯 RATA-RATA     : ${avgScore}%
 
 👥 DETAIL PER USER:
 ━━━━━━━━━━━━━━━━━━━
@@ -1211,12 +1408,13 @@ ${users.map(user => {
     const userSuccess = userMatches.filter(m => m.status === 'success').length;
     const userFailed = userMatches.filter(m => m.status === 'failed').length;
     const userPending = userMatches.filter(m => m.status === 'pending').length;
-    return `${user}: ✓${userSuccess} ✗${userFailed} ⏳${userPending}`;
+    const userAvg = userMatches.length > 0 ? Math.round(userMatches.reduce((sum, m) => sum + m.score, 0) / userMatches.length) : 0;
+    return `${user}: ✓${userSuccess} ✗${userFailed} ⏳${userPending} (avg:${userAvg}%)`;
 }).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━
 📋 LIST BERHASIL:
-${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`).join('\n')}
+${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} [${m.score}%]`).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━
 💾 DATA TERSIMPAN LOKAL
@@ -1232,62 +1430,7 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`
             });
             
             // Alert ringkas
-            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n\n📋 Detail sudah di clipboard!`);
-        }
-
-        // ==================== CLEAR ALL ====================
-        function clearAll() {
-            if (confirm('Yakin mau hapus semua data?')) {
-                document.getElementById('user-input').value = '';
-                document.getElementById('pass-input').value = '';
-                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada user. Klik PROCESS!</div>';
-                document.getElementById('selected-user-display').innerText = '-';
-                document.getElementById('current-user-display').innerText = '-';
-                document.getElementById('current-pass-display').innerText = '-';
-                document.getElementById('password-slider').style.display = 'none';
-                document.getElementById('no-password-selected').style.display = 'block';
-                document.getElementById('no-password-selected').innerHTML = `
-                    <i class="fas fa-arrow-left text-3xl mb-3"></i>
-                    <p class="text-sm">Pilih user dulu dari daftar di atas</p>
-                `;
-                document.getElementById('success-btn').style.display = 'none';
-                document.getElementById('failed-btn').style.display = 'none';
-                document.getElementById('prev-btn').disabled = true;
-                document.getElementById('next-btn').disabled = true;
-                document.getElementById('password-counter').innerText = '0/0';
-                document.getElementById('success-count').innerText = '0';
-                document.getElementById('failed-count').innerText = '0';
-                document.getElementById('pending-count').innerText = '0';
-                
-                // Reset filter
-                currentFilter = 'all';
-                updateFilterButtons();
-                
-                users = [];
-                passwords = [];
-                matches = [];
-                selectedUser = null;
-                currentIndex = 0;
-                
-                // Hapus dari localStorage juga
-                localStorage.removeItem(STORAGE_KEY);
-                document.getElementById('last-saved').innerText = '-';
-                
-                updateCounts();
-                showToast('🧹 SEMUA DIHAPUS', 1500);
-            }
-        }
-
-        // ==================== AUTO-SAVE TRIGGERS ====================
-        function setupAutoSave() {
-            // Simpan setiap kali ada perubahan status
-            const originalConfirmSuccess = confirmSuccess;
-            const originalConfirmFailed = confirmFailed;
-            const originalMarkAsSuccess = markAsSuccess;
-            const originalMarkAsFailed = markAsFailed;
-            
-            // Override functions sudah termasuk save
-            // Tambahin auto save untuk navigasi
+            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n📋 Detail sudah di clipboard!`);
         }
 
         // ==================== INIT ====================
@@ -1302,19 +1445,14 @@ ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password}`
             const hasData = loadFromLocalStorage();
             
             if (!hasData) {
-                // Kalau ga ada data, kasih contoh
-                document.getElementById('user-input').value = 'daniel\njustin\nrobert\nrobe';
-                document.getElementById('pass-input').value = `'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'`;
-                
-                setTimeout(() => {
-                    processData();
-                }, 500);
+                // Kosong total, ga ada contoh
+                updateCounts();
+                showToast('🟢 XREZZKY V40.0 READY - SUPER AKURAT CHECKER', 2000);
+            } else {
+                showToast('🟢 Data dimuat dari penyimpanan lokal', 2000);
             }
             
-            updateCounts();
             updateFilterButtons();
-            
-            showToast('🟢 SYSTEM READY - Data tersimpan lokal', 2000);
         };
 
         // Simpan data sebelum user meninggalkan halaman
