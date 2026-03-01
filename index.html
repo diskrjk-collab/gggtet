@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V36.0</title>
+    <title>XREZZKY Ω-CHECKER V37.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -33,18 +33,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         
-        @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-        .scanning::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(112, 0, 255, 0.5);
-            animation: scan 2s linear infinite;
-        }
-        
         .user-item {
             transition: all 0.2s ease;
             cursor: pointer;
@@ -61,13 +49,37 @@
         }
         
         .password-card {
-            transition: all 0.2s ease;
-            min-width: 250px;
+            transition: all 0.3s ease;
+            min-width: 280px;
+            max-width: 280px;
             scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
         }
         .password-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
             border-color: #ff0055 !important;
+            box-shadow: 0 10px 25px -5px rgba(255, 0, 85, 0.3);
+        }
+        
+        .password-card.copied {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+            border-color: #ff0000 !important;
+            pointer-events: none;
+        }
+        
+        .password-card.copied::after {
+            content: "✓ COPIED";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff0000;
+            color: white;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
         }
         
         .slider-container {
@@ -75,25 +87,64 @@
             overflow-x: auto;
             display: flex;
             gap: 1rem;
-            padding: 0.5rem 0;
+            padding: 0.5rem 0.25rem;
+            scroll-behavior: smooth;
+        }
+        
+        .slider-container::-webkit-scrollbar {
+            height: 6px;
         }
         
         .match-badge {
             background: linear-gradient(135deg, #ff0055 0%, #7000ff 100%);
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 10px;
             font-weight: bold;
+            display: inline-block;
         }
         
-        .copied-item {
-            animation: pulse-green 0.5s ease;
+        .nav-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-button:hover:not(:disabled) {
+            background: rgba(255, 0, 85, 0.2);
+            border-color: #ff0055;
+            transform: scale(1.1);
+        }
+        
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .history-indicator {
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: orange;
         }
         
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+        
+        .copy-success {
+            animation: pulse-green 0.5s ease;
         }
     </style>
 </head>
@@ -104,7 +155,7 @@
             <h1 class="mono text-2xl md:text-4xl font-bold tracking-tighter italic">
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
-            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest">V36.0 - 1 USER ∞ PASSWORDS</p>
+            <p class="text-gray-500 mono text-[10px] uppercase tracking-widest">V37.0 - 1x MUNDUR EDITION</p>
         </div>
         <div class="flex gap-2">
             <button onclick="clearAll()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all">
@@ -120,7 +171,7 @@
         
         <!-- LEFT PANEL - INPUT -->
         <div class="lg:col-span-4 space-y-4">
-            <div class="glass p-5 rounded-3xl relative overflow-hidden scanning">
+            <div class="glass p-5 rounded-3xl relative overflow-hidden">
                 <h2 class="text-lg font-bold flex items-center gap-2 mb-4">
                     <i class="fas fa-microchip text-purple-500"></i> INPUT DATA
                 </h2>
@@ -132,59 +183,33 @@
                             <label class="text-[10px] mono text-gray-400">USERNAMES</label>
                             <span id="user-count" class="text-[10px] text-purple-400 mono">0</span>
                         </div>
-                        <textarea id="user-input" rows="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-purple-500/50 mono text-sm custom-scrollbar" placeholder="user1&#10;user2&#10;&quot;user3&quot;"></textarea>
-                        <p class="text-[8px] text-gray-600 mt-1">Bisa pake kutip: "agusuges2329" → agusuges2329</p>
+                        <textarea id="user-input" rows="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-purple-500/50 mono text-sm custom-scrollbar" placeholder="user1&#10;user2">daniel
+justin
+robert
+robe</textarea>
                     </div>
 
-                    <!-- PASSWORD INPUT -->
+                    <!-- PASSWORD INPUT with EXAMPLE -->
                     <div>
                         <div class="flex justify-between mb-1">
                             <label class="text-[10px] mono text-gray-400">PASSWORDS</label>
                             <span id="pass-count" class="text-[10px] text-pink-400 mono">0</span>
                         </div>
-                        <textarea id="pass-input" rows="6" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2&#10;&quot;pass123&quot;"></textarea>
+                        <textarea id="pass-input" rows="6" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 focus:outline-none focus:border-pink-500/50 mono text-sm custom-scrollbar" placeholder="password1&#10;password2">'daniel20122012', 'just20122012', 'robert12', 'robe3636', 'just18', 'justin20122012', 'just1234', 'robert1234', 'robe1234', 'just123', 'robert123', 'robe12', 'justin12', 'robert20122012', 'robert3636', 'justin123', 'just3636', 'just12', 'daniel1234', 'daniel18', 'daniel3636', 'daniel12', 'robe18', 'robe123', 'robert18', 'justin3636', 'justin18', 'daniel123', 'robe20122012', 'justin1234'</textarea>
+                        <p class="text-[8px] text-green-400 mt-1 flex items-center gap-1">
+                            <i class="fas fa-check-circle"></i> AUTO CLEAN: 'text' → text
+                        </p>
                     </div>
 
                     <!-- MATCH THRESHOLD -->
                     <div class="glass-dark p-4 rounded-2xl">
                         <label class="text-xs text-gray-400 block mb-2">MINIMUM MATCH SCORE</label>
-                        <input type="range" id="match-threshold" min="0" max="100" value="50" class="w-full accent-pink-600" oninput="updateThresholdLabel()">
+                        <input type="range" id="match-threshold" min="0" max="100" value="30" class="w-full accent-pink-600" oninput="updateThresholdLabel()">
                         <div class="flex justify-between mt-1">
                             <span class="text-[10px] text-gray-600">0%</span>
-                            <span id="threshold-value" class="text-[10px] text-pink-400 font-bold">50%</span>
+                            <span id="threshold-value" class="text-[10px] text-pink-400 font-bold">30%</span>
                             <span class="text-[10px] text-gray-600">100%</span>
                         </div>
-                    </div>
-
-                    <!-- AUTO PARSE OPTION -->
-                    <label class="flex items-center gap-2 text-xs text-gray-400">
-                        <input type="checkbox" id="auto-parse" class="accent-pink-600" checked>
-                        Auto-parse quotes ( "text" → text )
-                    </label>
-                </div>
-            </div>
-
-            <!-- STATS CARD -->
-            <div class="glass p-5 rounded-3xl" id="stats-card" style="display: none;">
-                <h3 class="text-sm font-bold mb-3 flex items-center gap-2">
-                    <i class="fas fa-chart-line text-green-500"></i> STATISTICS
-                </h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white/5 p-3 rounded-xl">
-                        <p class="text-[8px] text-gray-500">USERS</p>
-                        <p id="stat-users" class="text-xl font-bold">0</p>
-                    </div>
-                    <div class="bg-white/5 p-3 rounded-xl">
-                        <p class="text-[8px] text-gray-500">PASSWORDS</p>
-                        <p id="stat-passes" class="text-xl font-bold">0</p>
-                    </div>
-                    <div class="bg-white/5 p-3 rounded-xl">
-                        <p class="text-[8px] text-gray-500">MATCHES</p>
-                        <p id="stat-matches" class="text-xl font-bold">0</p>
-                    </div>
-                    <div class="bg-white/5 p-3 rounded-xl">
-                        <p class="text-[8px] text-gray-500">AVG SCORE</p>
-                        <p id="stat-avg" class="text-xl font-bold">0%</p>
                     </div>
                 </div>
             </div>
@@ -198,7 +223,7 @@
                     <i class="fas fa-users text-blue-500"></i> USER LIST
                 </h3>
                 <div id="user-list" class="flex flex-wrap gap-2 min-h-[60px] max-h-[120px] overflow-y-auto custom-scrollbar p-2">
-                    <div class="text-gray-600 text-sm w-full text-center">Belum ada user. Isi username dulu!</div>
+                    <div class="text-gray-600 text-sm w-full text-center">Belum ada user. Klik PROCESS!</div>
                 </div>
             </div>
 
@@ -211,24 +236,40 @@
                             <p class="text-[10px] text-gray-500">SELECTED USER</p>
                             <h2 id="selected-user-display" class="text-2xl font-bold mono">-</h2>
                         </div>
-                        <button id="copy-all-user-btn" onclick="copyAllForSelectedUser()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/10 transition-all" style="display: none;">
-                            <i class="fas fa-copy mr-2"></i> COPY ALL FOR THIS USER
+                        <div class="flex items-center gap-2">
+                            <!-- History indicator -->
+                            <div id="history-indicator" class="history-indicator" style="display: none;">
+                                <i class="fas fa-history mr-1"></i> <span id="history-status">Bisa mundur 1x</span>
+                            </div>
+                            <!-- Copy all button (disabled di versi ini) -->
+                            <button disabled class="glass px-4 py-2 rounded-xl text-xs opacity-30 cursor-not-allowed">
+                                <i class="fas fa-ban mr-2"></i> 1x MUNDUR ONLY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="px-5 pt-4 flex justify-between items-center">
+                    <h3 class="text-sm font-bold flex items-center gap-2">
+                        <i class="fas fa-key text-pink-500"></i> PASSWORD SLIDER
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="prev-btn" class="nav-button" onclick="slidePrev()" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="password-counter" class="text-xs bg-white/10 px-3 py-1 rounded-full flex items-center">0/0</span>
+                        <button id="next-btn" class="nav-button" onclick="slideNext()" disabled>
+                            <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Password Slider -->
-                <div class="p-5">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold flex items-center gap-2">
-                            <i class="fas fa-key text-pink-500"></i> MATCHING PASSWORDS
-                        </h3>
-                        <span id="password-count" class="text-xs bg-pink-500/20 px-3 py-1 rounded-full">0 passwords</span>
-                    </div>
-
+                <div class="p-5 pt-2">
                     <div id="password-slider-container" class="relative">
                         <!-- Slider -->
-                        <div id="password-slider" class="slider-container custom-scrollbar pb-2" style="display: none;">
+                        <div id="password-slider" class="slider-container custom-scrollbar" style="display: none;">
                             <!-- Password cards akan diisi oleh JS -->
                         </div>
 
@@ -236,6 +277,23 @@
                         <div id="no-password-selected" class="text-center py-10 opacity-50">
                             <i class="fas fa-arrow-left text-3xl mb-3"></i>
                             <p class="text-sm">Pilih user dulu dari daftar di atas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Password Display -->
+                <div class="px-5 pb-5">
+                    <div class="glass-dark p-4 rounded-xl">
+                        <p class="text-[8px] text-gray-500 mb-1">CURRENT SELECTION</p>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span id="current-user-display" class="mono text-sm font-bold">-</span>
+                                <span class="text-gray-600 mx-1">:</span>
+                                <span id="current-pass-display" class="mono text-sm text-pink-400">-</span>
+                            </div>
+                            <button id="copy-current-btn" onclick="copyCurrentPassword()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                <i class="fas fa-copy"></i> COPY THIS
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -255,6 +313,11 @@
         let matches = []; // [{ user, password, score }]
         let selectedUser = null;
         let copiedCombos = new Set(); // Untuk tracking yang udah dicopy
+        
+        // Slider state
+        let currentIndex = 0;
+        let lastIndex = -1; // Untuk tracking mundur 1x
+        let hasMundur = false; // Apakah sudah pernah mundur?
 
         // ==================== UTILITY FUNCTIONS ====================
         function showToast(msg, duration = 2000) {
@@ -269,16 +332,29 @@
             }, duration);
         }
 
-        function parseQuotedText(text) {
-            // Hilangkan kutip di awal dan akhir
-            return text.replace(/^["']|["']$/g, '').trim();
+        function cleanQuotes(text) {
+            // Hilangkan kutip di awal dan akhir, juga koma
+            return text.replace(/^['"]|['"]$|,$/g, '').trim();
+        }
+
+        function parseInput(input) {
+            // Pisah berdasarkan koma atau newline
+            const items = input.split(/[,\n]/)
+                .map(item => item.trim())
+                .filter(item => item.length > 0)
+                .map(item => cleanQuotes(item));
+            return items;
         }
 
         function updateCounts() {
-            const rawUsers = document.getElementById('user-input').value.split('\n').filter(x => x.trim());
-            const rawPasses = document.getElementById('pass-input').value.split('\n').filter(x => x.trim());
-            document.getElementById('user-count').innerText = rawUsers.length;
-            document.getElementById('pass-count').innerText = rawPasses.length;
+            const rawUsers = document.getElementById('user-input').value;
+            const rawPasses = document.getElementById('pass-input').value;
+            
+            const userItems = parseInput(rawUsers);
+            const passItems = parseInput(rawPasses);
+            
+            document.getElementById('user-count').innerText = userItems.length;
+            document.getElementById('pass-count').innerText = passItems.length;
         }
 
         function updateThresholdLabel() {
@@ -295,13 +371,8 @@
             
             let score = 0;
             
-            // Exact match setelah remove numbers
-            const uLetters = u.replace(/[0-9]/g, '');
-            const pLetters = p.replace(/[0-9]/g, '');
-            if (uLetters === pLetters && uLetters.length > 0) score += 60;
-            
             // User ada di dalam password atau sebaliknya
-            if (p.includes(u) || u.includes(p)) score += 40;
+            if (p.includes(u) || u.includes(p)) score += 50;
             
             // Prefix match
             let prefixCount = 0;
@@ -309,7 +380,7 @@
                 if (u[i] === p[i]) prefixCount++;
                 else break;
             }
-            score += (prefixCount * 3);
+            score += (prefixCount * 5);
             
             // Number match
             const uNums = u.replace(/\D/g, '');
@@ -325,26 +396,19 @@
         // ==================== PROCESS DATA ====================
         function processData() {
             // Parse users
-            const rawUsers = document.getElementById('user-input').value.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
+            const rawUsers = document.getElementById('user-input').value;
+            users = parseInput(rawUsers);
             
             // Parse passwords
-            const rawPasswords = document.getElementById('pass-input').value.split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
+            const rawPasswords = document.getElementById('pass-input').value;
+            passwords = parseInput(rawPasswords);
             
-            if (rawUsers.length === 0 || rawPasswords.length === 0) {
+            if (users.length === 0 || passwords.length === 0) {
                 showToast('ISI USERNAME DAN PASSWORD DULU!', 3000);
                 return;
             }
 
-            const autoParse = document.getElementById('auto-parse').checked;
             const threshold = parseInt(document.getElementById('match-threshold').value);
-
-            // Bersihin data dari kutip
-            users = rawUsers.map(u => autoParse ? parseQuotedText(u) : u);
-            passwords = rawPasswords.map(p => autoParse ? parseQuotedText(p) : p);
 
             // Hitung semua kemungkinan match
             matches = [];
@@ -365,15 +429,22 @@
 
             // Update UI
             updateUserList();
-            updateStats();
 
             // Reset selected user
             selectedUser = null;
+            currentIndex = 0;
+            lastIndex = -1;
+            hasMundur = false;
+            
             document.getElementById('selected-user-display').innerText = '-';
+            document.getElementById('current-user-display').innerText = '-';
+            document.getElementById('current-pass-display').innerText = '-';
             document.getElementById('password-slider').style.display = 'none';
             document.getElementById('no-password-selected').style.display = 'block';
-            document.getElementById('copy-all-user-btn').style.display = 'none';
-            document.getElementById('password-count').innerText = '0 passwords';
+            document.getElementById('history-indicator').style.display = 'none';
+            document.getElementById('prev-btn').disabled = true;
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('password-counter').innerText = '0/0';
 
             showToast(`✅ DITEMUKAN ${matches.length} KOMBINASI`, 2000);
         }
@@ -406,14 +477,11 @@
                 
                 userElement.innerHTML = `
                     <span class="mono truncate max-w-[150px]">${user}</span>
-                    <span class="text-[10px] bg-pink-500/20 px-2 py-0.5 rounded-full ml-auto">${matchCount}</span>
+                    <span class="text-[10px] ${matchCount > 0 ? 'bg-pink-500/20' : 'bg-gray-500/20'} px-2 py-0.5 rounded-full ml-auto">${matchCount}</span>
                 `;
                 
                 container.appendChild(userElement);
             });
-
-            // Show stats card
-            document.getElementById('stats-card').style.display = 'block';
         }
 
         // ==================== SELECT USER ====================
@@ -434,13 +502,20 @@
             const userMatches = matches.filter(m => m.user === user);
             
             if (userMatches.length > 0) {
+                // Reset slider state
+                currentIndex = 0;
+                lastIndex = -1;
+                hasMundur = false;
+                
                 // Tampilkan slider
                 document.getElementById('password-slider').style.display = 'flex';
                 document.getElementById('no-password-selected').style.display = 'none';
-                document.getElementById('copy-all-user-btn').style.display = 'block';
-                document.getElementById('password-count').innerText = `${userMatches.length} passwords`;
+                document.getElementById('history-indicator').style.display = 'flex';
+                document.getElementById('history-status').innerText = 'Bisa mundur 1x';
                 
                 renderPasswordSlider(userMatches);
+                updateCurrentDisplay(userMatches);
+                updateNavButtons(userMatches.length);
             } else {
                 // Ga ada password yang cocok
                 document.getElementById('password-slider').style.display = 'none';
@@ -449,8 +524,12 @@
                     <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
                     <p class="text-sm">Tidak ada password yang cocok untuk user ini</p>
                 `;
-                document.getElementById('copy-all-user-btn').style.display = 'none';
-                document.getElementById('password-count').innerText = '0 passwords';
+                document.getElementById('history-indicator').style.display = 'none';
+                document.getElementById('current-user-display').innerText = '-';
+                document.getElementById('current-pass-display').innerText = '-';
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('password-counter').innerText = '0/0';
             }
         }
 
@@ -464,39 +543,153 @@
                 const isCopied = copiedCombos.has(combo);
                 
                 const card = document.createElement('div');
-                card.className = `password-card glass p-4 rounded-xl border ${isCopied ? 'border-red-500/50 opacity-50' : 'border-white/10 hover:border-pink-500'}`;
+                card.className = `password-card glass p-4 rounded-xl border ${isCopied ? 'copied' : 'border-white/10'}`;
                 card.setAttribute('data-combo', combo);
+                card.setAttribute('data-index', index);
+                card.setAttribute('data-password', match.password);
+                card.setAttribute('data-score', match.score);
                 
-                // Match badge
-                let badgeColor = 'bg-green-500';
-                if (match.score < 60) badgeColor = 'bg-yellow-500';
-                if (match.score < 40) badgeColor = 'bg-red-500';
+                // Match badge color based on score
+                let badgeClass = 'from-green-500 to-green-600';
+                if (match.score < 60) badgeClass = 'from-yellow-500 to-yellow-600';
+                if (match.score < 40) badgeClass = 'from-red-500 to-red-600';
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
-                        <span class="match-badge ${badgeColor}">${match.score}% match</span>
-                        ${isCopied ? '<span class="text-[8px] text-red-400">✓ COPIED</span>' : ''}
+                        <span class="match-badge bg-gradient-to-r ${badgeClass}">${match.score}% match</span>
                     </div>
-                    <div class="mono text-sm mb-4 break-all">${match.password}</div>
-                    <div class="flex gap-2">
-                        ${!isCopied ? 
-                            `<button onclick="copyPassword('${match.user}', '${match.password}', this)" class="flex-1 bg-pink-600/20 hover:bg-pink-600/30 border border-pink-500/30 py-2 rounded-lg text-xs font-bold transition-all">
-                                <i class="fas fa-copy mr-1"></i> COPY
-                            </button>` :
-                            `<button disabled class="flex-1 bg-gray-800/50 py-2 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed">
-                                <i class="fas fa-check mr-1"></i> COPIED
-                            </button>`
-                        }
+                    <div class="mono text-sm mb-4 break-all min-h-[60px]">${match.password}</div>
+                    <div class="text-[8px] text-gray-500 text-right">
+                        #${index + 1}
                     </div>
                 `;
                 
+                // Klik card untuk pilih password ini
+                card.onclick = () => {
+                    const idx = parseInt(card.getAttribute('data-index'));
+                    goToIndex(idx, userMatches);
+                };
+                
                 slider.appendChild(card);
             });
+
+            // Scroll ke index yang aktif
+            setTimeout(() => {
+                const cards = slider.children;
+                if (cards.length > 0 && currentIndex < cards.length) {
+                    cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                }
+            }, 100);
         }
 
-        // ==================== COPY PASSWORD ====================
-        function copyPassword(user, password, buttonElement) {
-            const combo = `${user}:${password}`;
+        // ==================== UPDATE CURRENT DISPLAY ====================
+        function updateCurrentDisplay(userMatches) {
+            if (userMatches.length > 0 && currentIndex < userMatches.length) {
+                const current = userMatches[currentIndex];
+                document.getElementById('current-user-display').innerText = current.user;
+                document.getElementById('current-pass-display').innerText = current.password;
+                document.getElementById('password-counter').innerText = `${currentIndex + 1}/${userMatches.length}`;
+            }
+        }
+
+        // ==================== UPDATE NAV BUTTONS ====================
+        function updateNavButtons(totalItems) {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            // Prev: bisa kalau bukan index 0 DAN (belum pernah mundur ATAU mundur terakhir dari index yang berbeda)
+            const canPrev = currentIndex > 0;
+            prevBtn.disabled = !canPrev;
+            
+            // Next: bisa kalau bukan index terakhir
+            const canNext = currentIndex < totalItems - 1;
+            nextBtn.disabled = !canNext;
+            
+            // Update history indicator
+            if (lastIndex !== -1 && currentIndex === lastIndex) {
+                document.getElementById('history-status').innerText = 'Sedang di posisi mundur';
+                document.getElementById('history-indicator').style.background = 'rgba(255, 165, 0, 0.3)';
+            } else {
+                document.getElementById('history-status').innerText = hasMundur ? 'Sudah pernah mundur' : 'Bisa mundur 1x';
+                document.getElementById('history-indicator').style.background = 'rgba(255, 165, 0, 0.2)';
+            }
+        }
+
+        // ==================== GO TO INDEX ====================
+        function goToIndex(index, userMatches) {
+            if (!userMatches) {
+                userMatches = matches.filter(m => m.user === selectedUser);
+            }
+            
+            if (index >= 0 && index < userMatches.length) {
+                currentIndex = index;
+                updateCurrentDisplay(userMatches);
+                updateNavButtons(userMatches.length);
+                
+                // Scroll ke card yang dipilih
+                const slider = document.getElementById('password-slider');
+                const cards = slider.children;
+                if (cards.length > index) {
+                    cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                }
+            }
+        }
+
+        // ==================== SLIDE NAVIGATION ====================
+        function slidePrev() {
+            const userMatches = matches.filter(m => m.user === selectedUser);
+            if (!userMatches.length) return;
+            
+            if (currentIndex > 0) {
+                // Simpan index sebelumnya untuk tracking mundur
+                if (!hasMundur && currentIndex > 0) {
+                    lastIndex = currentIndex;
+                    hasMundur = true;
+                }
+                
+                currentIndex--;
+                updateCurrentDisplay(userMatches);
+                updateNavButtons(userMatches.length);
+                
+                // Scroll
+                const slider = document.getElementById('password-slider');
+                const cards = slider.children;
+                if (cards.length > currentIndex) {
+                    cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                }
+            }
+        }
+
+        function slideNext() {
+            const userMatches = matches.filter(m => m.user === selectedUser);
+            if (!userMatches.length) return;
+            
+            if (currentIndex < userMatches.length - 1) {
+                currentIndex++;
+                updateCurrentDisplay(userMatches);
+                updateNavButtons(userMatches.length);
+                
+                // Scroll
+                const slider = document.getElementById('password-slider');
+                const cards = slider.children;
+                if (cards.length > currentIndex) {
+                    cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                }
+            }
+        }
+
+        // ==================== COPY CURRENT PASSWORD ====================
+        function copyCurrentPassword() {
+            if (!selectedUser) {
+                showToast('PILIH USER DULU!', 1500);
+                return;
+            }
+
+            const userMatches = matches.filter(m => m.user === selectedUser);
+            if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
+
+            const current = userMatches[currentIndex];
+            const combo = `${current.user}:${current.password}`;
             
             // Cek udah pernah dicopy
             if (copiedCombos.has(combo)) {
@@ -509,73 +702,30 @@
                 // Tandai sebagai copied
                 copiedCombos.add(combo);
                 
-                // Animasi button
-                buttonElement.innerHTML = '<i class="fas fa-check mr-1"></i> COPIED!';
-                buttonElement.disabled = true;
-                buttonElement.classList.add('opacity-50', 'cursor-not-allowed');
-                
-                // Update card
-                const card = buttonElement.closest('.password-card');
-                card.classList.add('border-red-500/50', 'opacity-50');
-                
-                // Tambahin label copied
-                const badgeContainer = card.querySelector('.flex.justify-between.items-start.mb-3');
-                if (badgeContainer && !badgeContainer.innerHTML.includes('COPIED')) {
-                    badgeContainer.innerHTML += '<span class="text-[8px] text-red-400">✓ COPIED</span>';
+                // Update card visual
+                const slider = document.getElementById('password-slider');
+                const cards = slider.children;
+                if (cards.length > currentIndex) {
+                    cards[currentIndex].classList.add('copied');
                 }
+                
+                // Animasi button
+                const copyBtn = document.getElementById('copy-current-btn');
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> COPIED!';
+                copyBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                copyBtn.disabled = true;
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> COPY THIS';
+                    copyBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    copyBtn.classList.add('bg-pink-600', 'hover:bg-pink-700');
+                    copyBtn.disabled = false;
+                }, 2000);
                 
                 showToast(`✅ COPIED: ${combo}`, 1500);
-                
-                // Buka login page kalo ada
-                if (confirm('Buka halaman login?')) {
-                    window.open('https://www.roblox.com/login', '_blank');
-                }
             }).catch(err => {
                 showToast('❌ GAGAL COPY!', 1500);
             });
-        }
-
-        // ==================== COPY ALL FOR SELECTED USER ====================
-        function copyAllForSelectedUser() {
-            if (!selectedUser) {
-                showToast('PILIH USER DULU!', 1500);
-                return;
-            }
-
-            const userMatches = matches.filter(m => m.user === selectedUser);
-            const uncopiedMatches = userMatches.filter(m => !copiedCombos.has(`${m.user}:${m.password}`));
-            
-            if (uncopiedMatches.length === 0) {
-                showToast('✅ SEMUA SUDAH DI COPY!', 1500);
-                return;
-            }
-
-            // Gabungin semua combo
-            const allCombos = uncopiedMatches.map(m => `${m.user}:${m.password}`).join('\n');
-            
-            navigator.clipboard.writeText(allCombos).then(() => {
-                // Tandai semua sebagai copied
-                uncopiedMatches.forEach(m => {
-                    copiedCombos.add(`${m.user}:${m.password}`);
-                });
-                
-                // Re-render slider
-                selectUser(selectedUser);
-                
-                showToast(`✅ COPIED ${uncopiedMatches.length} PASSWORDS`, 2000);
-            });
-        }
-
-        // ==================== UPDATE STATS ====================
-        function updateStats() {
-            document.getElementById('stat-users').innerText = users.length;
-            document.getElementById('stat-passes').innerText = passwords.length;
-            document.getElementById('stat-matches').innerText = matches.length;
-            
-            const avgScore = matches.length > 0 
-                ? Math.round(matches.reduce((sum, m) => sum + m.score, 0) / matches.length) 
-                : 0;
-            document.getElementById('stat-avg').innerText = avgScore + '%';
         }
 
         // ==================== CLEAR ALL ====================
@@ -583,23 +733,29 @@
             if (confirm('Yakin mau hapus semua data?')) {
                 document.getElementById('user-input').value = '';
                 document.getElementById('pass-input').value = '';
-                document.getElementById('stats-card').style.display = 'none';
-                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada user. Isi username dulu!</div>';
+                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada user. Klik PROCESS!</div>';
                 document.getElementById('selected-user-display').innerText = '-';
+                document.getElementById('current-user-display').innerText = '-';
+                document.getElementById('current-pass-display').innerText = '-';
                 document.getElementById('password-slider').style.display = 'none';
                 document.getElementById('no-password-selected').style.display = 'block';
                 document.getElementById('no-password-selected').innerHTML = `
                     <i class="fas fa-arrow-left text-3xl mb-3"></i>
                     <p class="text-sm">Pilih user dulu dari daftar di atas</p>
                 `;
-                document.getElementById('copy-all-user-btn').style.display = 'none';
-                document.getElementById('password-count').innerText = '0 passwords';
+                document.getElementById('history-indicator').style.display = 'none';
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('password-counter').innerText = '0/0';
                 
                 users = [];
                 passwords = [];
                 matches = [];
                 selectedUser = null;
                 copiedCombos.clear();
+                currentIndex = 0;
+                lastIndex = -1;
+                hasMundur = false;
                 
                 updateCounts();
                 showToast('🧹 SEMUA DIHAPUS', 1500);
@@ -613,11 +769,14 @@
         // Auto-update threshold label
         updateThresholdLabel();
 
-        // Contoh data biar ga kosong (bisa dihapus kalo mau)
+        // Auto process on load with sample data
         window.onload = function() {
-            // Biarin kosong dulu sesuai request
-            showToast('🟢 SYSTEM READY - ISI DATA DULU', 2000);
+            // Auto clean and process
+            setTimeout(() => {
+                processData();
+                updateCounts();
+            }, 500);
         };
     </script>
 </body>
-    </html>
+</html>
