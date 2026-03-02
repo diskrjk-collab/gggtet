@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XREZZKY Ω-CHECKER V42.0</title>
+    <title>XREZZKY Ω-CHECKER V43.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -284,13 +284,13 @@
         /* COPY STATUS */
         .copy-status {
             font-size: 10px;
-            padding: 4px 8px;
+            padding: 4px 12px;
             border-radius: 20px;
             background: rgba(0, 255, 136, 0.2);
             border: 1px solid #00ff88;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
         
         /* FOOTER */
@@ -312,7 +312,7 @@
                 <span class="text-transparent bg-clip-text accent-gradient">XREZZKY</span> Ω-CHECKER
             </h1>
             <p class="text-gray-500 mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                V42.0 - INSTANT COPY 
+                V43.0 - FIXED INSTANT COPY 
                 <span class="instant-badge">USER → LANGSUNG → PASS</span>
                 <span class="storage-indicator">
                     <i class="fas fa-database"></i> Auto-save
@@ -320,7 +320,6 @@
             </p>
         </div>
         <div class="flex gap-2">
-            <!-- SATU TOMBOL CLEAR UNTUK SEMUA -->
             <button onclick="clearAllData()" class="clear-btn px-4 py-2 rounded-xl text-xs font-bold text-white hover:scale-105 transition-all flex items-center gap-2">
                 <i class="fas fa-trash-alt mr-1"></i> CLEAR ALL DATA
             </button>
@@ -407,7 +406,7 @@
                             <li><strong>Data tersimpan</strong> di device kamu sendiri (local storage).</li>
                             <li><strong>Akurasi berdasarkan:</strong> kemiripan huruf (min 3), angka (min 3), prefix, suffix, substring.</li>
                             <li><strong>Status login</strong> hanya untuk tracking pribadi, bukan verifikasi resmi.</li>
-                            <li><strong>INSTANT COPY:</strong> Sekali klik, langsung copy USER lalu LANGSUNG copy PASSWORD (tanpa jeda).</li>
+                            <li><strong>INSTANT COPY FIXED:</strong> Sekali klik, langsung copy USER lalu LANGSUNG copy PASSWORD sesuai pilihan.</li>
                         </ul>
                         <div class="mt-2 text-[8px] text-gray-600 border-t border-white/5 pt-2">
                             ⚠️ Penggunaan di luar tanggung jawab pengguna. Kami hanya menyediakan alat bantu analisis.
@@ -450,7 +449,6 @@
                             <h2 id="selected-user-display" class="text-2xl font-bold mono">-</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <!-- Status counts -->
                             <div class="flex gap-2 text-[10px]">
                                 <span class="text-green-400"><i class="fas fa-check-circle"></i> <span id="success-count">0</span></span>
                                 <span class="text-red-400"><i class="fas fa-times-circle"></i> <span id="failed-count">0</span></span>
@@ -486,12 +484,7 @@
                 <!-- Password Slider -->
                 <div class="p-5 pt-2">
                     <div id="password-slider-container" class="relative">
-                        <!-- Slider -->
-                        <div id="password-slider" class="slider-container custom-scrollbar" style="display: none;">
-                            <!-- Password cards akan diisi oleh JS -->
-                        </div>
-
-                        <!-- Empty State -->
+                        <div id="password-slider" class="slider-container custom-scrollbar" style="display: none;"></div>
                         <div id="no-password-selected" class="text-center py-10 opacity-50">
                             <i class="fas fa-arrow-left text-3xl mb-3"></i>
                             <p class="text-sm">Pilih user dulu dari daftar di atas</p>
@@ -510,8 +503,8 @@
                                 <span id="current-pass-display" class="mono text-sm text-pink-400">-</span>
                             </div>
                             <div class="flex gap-2">
-                                <button id="copy-current-btn" onclick="startInstantCopy()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
-                                    <i class="fas fa-bolt"></i> INSTANT COPY
+                                <button id="copy-current-btn" onclick="copyUserThenPassword()" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <i class="fas fa-bolt"></i> COPY USER & PASS
                                 </button>
                                 <button id="success-btn" onclick="markAsSuccess()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-bold transition-all" style="display: none;">
                                     <i class="fas fa-check"></i> BISA LOGIN
@@ -525,25 +518,23 @@
                 </div>
             </div>
 
-            <!-- INFO PANEL KECIL DI BAWAH RESULTS -->
             <div class="glass p-3 rounded-xl text-[8px] text-gray-500 flex items-center gap-2">
-                <i class="fas fa-bolt text-green-400"></i>
-                <span>INSTANT COPY: Sekali klik langsung copy USER lalu LANGSUNG copy PASSWORD (tanpa jeda).</span>
+                <i class="fas fa-check-circle text-green-400"></i>
+                <span>INSTANT COPY FIXED: Sekali klik langsung copy USER lalu LANGSUNG copy PASSWORD sesuai pilihan.</span>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER DENGAN DISCLAIMER LENGKAP -->
+    <!-- FOOTER -->
     <div class="footer max-w-7xl mx-auto w-full mt-8">
         <div class="text-[8px] text-gray-700 space-y-1">
-            <p>© 2026 XREZZKY Ω-CHECKER v42.0 - INSTANT COPY EDITION</p>
+            <p>© 2026 XREZZKY Ω-CHECKER v43.0 - FIXED INSTANT COPY EDITION</p>
             <p class="flex items-center justify-center gap-2">
                 <span class="w-1 h-1 bg-pink-500 rounded-full"></span>
                 <span>SISTEM INI HANYA UNTUK PENGECEKAN KECOCOKAN USER & PASSWORD</span>
                 <span class="w-1 h-1 bg-pink-500 rounded-full"></span>
             </p>
-            <p>⚠️ DISCLAIMER: Kami tidak bertanggung jawab atas penggunaan di luar fungsi. Jika tidak akurat dengan akun asli, itu di luar kendali kami. Web khusus PG - Password Generator/Checker.</p>
-            <p class="mt-2 text-gray-800">💾 Data tersimpan di local storage device masing-masing. Hapus data via tombol CLEAR ALL DATA.</p>
+            <p>⚠️ DISCLAIMER: Kami tidak bertanggung jawab atas penggunaan di luar fungsi. Web khusus PG - Password Generator/Checker.</p>
         </div>
     </div>
 
@@ -576,22 +567,17 @@
 
     <script>
         // ==================== LOCAL STORAGE KEY ====================
-        const STORAGE_KEY = 'xrezzky_checker_data_v42';
+        const STORAGE_KEY = 'xrezzky_checker_data_v43';
         
         // ==================== DATA STORE ====================
         let users = [];
         let passwords = [];
-        let matches = []; // [{ user, password, score, status: 'pending'|'success'|'failed' }]
+        let matches = [];
         let selectedUser = null;
-        
-        // Slider state
         let currentIndex = 0;
-        let currentFilter = 'all'; // all, success, failed, pending
-        
-        // Copy state
+        let currentFilter = 'all';
         let isCopying = false;
         
-        // Status tracking
         const statusColors = {
             pending: 'text-yellow-400',
             success: 'text-green-400',
@@ -603,16 +589,10 @@
             const u = user.toLowerCase().trim();
             const p = password.toLowerCase().trim();
             
-            // Kalo sama persis -> 100%
             if (u === p) return 100;
             
-            // Cek partial match (3-4 huruf/angka sama dimanapun)
-            
-            // 1. Cek huruf yang sama (case insensitive)
             const uLetters = u.replace(/[0-9]/g, '');
             const pLetters = p.replace(/[0-9]/g, '');
-            
-            // 2. Cek angka yang sama
             const uNums = u.replace(/\D/g, '');
             const pNums = p.replace(/\D/g, '');
             
@@ -621,19 +601,16 @@
             
             // HITUNG KEMIRIPAN HURUF
             if (uLetters.length > 0 && pLetters.length > 0) {
-                // Cari huruf yang sama (urutan bebas)
                 let commonLetters = 0;
                 const uLetterSet = new Set(uLetters.split(''));
                 const pLetterSet = new Set(pLetters.split(''));
                 
-                // Intersection
                 uLetterSet.forEach(letter => {
                     if (pLetterSet.has(letter)) {
                         commonLetters++;
                     }
                 });
                 
-                // Minimal 3 huruf sama atau 80% dari huruf terkecil
                 const minLetters = Math.min(uLetters.length, pLetters.length);
                 if (commonLetters >= 3 || (minLetters > 0 && commonLetters / minLetters >= 0.7)) {
                     score += 40;
@@ -646,7 +623,6 @@
             
             // HITUNG KEMIRIPAN ANGKA
             if (uNums.length > 0 && pNums.length > 0) {
-                // Cari angka yang sama (urutan bebas)
                 let commonNums = 0;
                 const uNumSet = new Set(uNums.split(''));
                 const pNumSet = new Set(pNums.split(''));
@@ -657,7 +633,6 @@
                     }
                 });
                 
-                // Minimal 3 angka sama atau semua angka sama
                 if (commonNums >= 3 || uNums === pNums) {
                     score += 40;
                     matchDetails.push(`angka:${commonNums}`);
@@ -667,13 +642,13 @@
                 }
             }
             
-            // CEK APAKAH USER ADA DI DALAM PASSWORD (substring)
+            // CEK APAKAH USER ADA DI DALAM PASSWORD
             if (p.includes(u) || u.includes(p)) {
                 score += 30;
                 matchDetails.push('substring');
             }
             
-            // CEK AWALAN YANG SAMA (prefix)
+            // CEK AWALAN
             let prefixLen = 0;
             for (let i = 0; i < Math.min(u.length, p.length); i++) {
                 if (u[i] === p[i]) prefixLen++;
@@ -687,7 +662,7 @@
                 matchDetails.push(`prefix:${prefixLen}`);
             }
             
-            // CEK AKHIRAN YANG SAMA (suffix)
+            // CEK AKHIRAN
             let suffixLen = 0;
             for (let i = 0; i < Math.min(u.length, p.length); i++) {
                 if (u[u.length - 1 - i] === p[p.length - 1 - i]) suffixLen++;
@@ -701,7 +676,7 @@
                 matchDetails.push(`suffix:${suffixLen}`);
             }
             
-            // CEK POLA UMUM (nama + angka, angka + nama)
+            // CEK NAMA SAMA
             const uName = u.replace(/[0-9]/g, '');
             const pName = p.replace(/[0-9]/g, '');
             
@@ -710,37 +685,28 @@
                 matchDetails.push('nama-sama');
             }
             
-            // BATASI MAKSIMAL 100
             const finalScore = Math.min(Math.round(score), 100);
-            
-            // Simpan detail untuk debugging
             console.log(`${user}:${password} = ${finalScore}% [${matchDetails.join(', ')}]`);
             
             return finalScore;
         }
 
-        // ==================== LOCAL STORAGE FUNCTIONS ====================
+        // ==================== LOCAL STORAGE ====================
         function saveToLocalStorage() {
             try {
                 const data = {
-                    users: users,
-                    passwords: passwords,
-                    matches: matches,
-                    selectedUser: selectedUser,
-                    currentFilter: currentFilter,
-                    currentIndex: currentIndex,
+                    users, passwords, matches, selectedUser,
+                    currentFilter, currentIndex,
                     timestamp: new Date().toISOString()
                 };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 
-                // Update last saved indicator
                 const now = new Date();
-                const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second:'2-digit' });
+                const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 document.getElementById('last-saved').innerText = `Terakhir: ${timeStr}`;
-                
                 return true;
             } catch (e) {
-                console.error('Gagal save ke localStorage:', e);
+                console.error('Gagal save:', e);
                 return false;
             }
         }
@@ -751,8 +717,6 @@
                 if (!saved) return false;
                 
                 const data = JSON.parse(saved);
-                
-                // Load data
                 users = data.users || [];
                 passwords = data.passwords || [];
                 matches = data.matches || [];
@@ -760,7 +724,6 @@
                 currentFilter = data.currentFilter || 'all';
                 currentIndex = data.currentIndex || 0;
                 
-                // Update UI
                 document.getElementById('user-input').value = users.join('\n');
                 document.getElementById('pass-input').value = passwords.join('\n');
                 
@@ -768,74 +731,21 @@
                 updateUserList();
                 updateFilterButtons();
                 
-                if (selectedUser) {
-                    selectUser(selectedUser);
-                }
+                if (selectedUser) selectUser(selectedUser);
                 
-                // Update last saved indicator
                 if (data.timestamp) {
                     const savedTime = new Date(data.timestamp);
                     const timeStr = savedTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                     document.getElementById('last-saved').innerText = `Dimuat: ${timeStr}`;
                 }
-                
                 return true;
             } catch (e) {
-                console.error('Gagal load dari localStorage:', e);
+                console.error('Gagal load:', e);
                 return false;
             }
         }
 
-        // ==================== CLEAR ALL DATA =======================
-
-                function clearAllData() {
-            if (confirm('⚠️ Yakin mau hapus SEMUA data?\n\n- Input users & passwords\n- Semua hasil analisis\n- Status login\n- Data tersimpan di device ini')) {
-                
-                // Kosongin input
-                document.getElementById('user-input').value = '';
-                document.getElementById('pass-input').value = '';
-                
-                // Reset semua variable
-                users = [];
-                passwords = [];
-                matches = [];
-                selectedUser = null;
-                currentIndex = 0;
-                currentFilter = 'all';
-                
-                // Hapus dari localStorage
-                localStorage.removeItem(STORAGE_KEY);
-                
-                // Update UI
-                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada data. Isi username & password lalu PROCESS!</div>';
-                document.getElementById('selected-user-display').innerText = '-';
-                document.getElementById('current-user-display').innerText = '-';
-                document.getElementById('current-pass-display').innerText = '-';
-                document.getElementById('password-slider').style.display = 'none';
-                document.getElementById('no-password-selected').style.display = 'block';
-                document.getElementById('no-password-selected').innerHTML = `
-                    <i class="fas fa-arrow-left text-3xl mb-3"></i>
-                    <p class="text-sm">Pilih user dulu dari daftar di atas</p>
-                `;
-                document.getElementById('success-btn').style.display = 'none';
-                document.getElementById('failed-btn').style.display = 'none';
-                document.getElementById('prev-btn').disabled = true;
-                document.getElementById('next-btn').disabled = true;
-                document.getElementById('password-counter').innerText = '0/0';
-                document.getElementById('success-count').innerText = '0';
-                document.getElementById('failed-count').innerText = '0';
-                document.getElementById('pending-count').innerText = '0';
-                document.getElementById('last-saved').innerText = '-';
-                
-                // Reset filter buttons
-                updateFilterButtons();
-                
-                updateCounts();
-                showToast('🧹 SEMUA DATA DIHAPUS!', 2000);
-            }
-        }
-
-        // ==================== UTILITY FUNCTIONS ====================
+        // ==================== UTILITY ====================
         function showToast(msg, duration = 2000) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toast-msg');
@@ -860,11 +770,8 @@
         }
 
         function updateCounts() {
-            const rawUsers = document.getElementById('user-input').value;
-            const rawPasses = document.getElementById('pass-input').value;
-            
-            document.getElementById('user-count').innerText = parseInput(rawUsers).length;
-            document.getElementById('pass-count').innerText = parseInput(rawPasses).length;
+            document.getElementById('user-count').innerText = parseInput(document.getElementById('user-input').value).length;
+            document.getElementById('pass-count').innerText = parseInput(document.getElementById('pass-input').value).length;
         }
 
         function updateThresholdLabel() {
@@ -874,7 +781,6 @@
 
         // ==================== PROCESS DATA ====================
         function processData() {
-            // Parse users
             users = parseInput(document.getElementById('user-input').value);
             passwords = parseInput(document.getElementById('pass-input').value);
             
@@ -883,38 +789,27 @@
                 return;
             }
 
-            const threshold = parseInt(document.getElementById('match-threshold').value);
+                        const threshold = parseInt(document.getElementById('match-threshold').value);
 
-            // Hitung semua kemungkinan match dengan SUPER AKURAT CHECKER
             matches = [];
             users.forEach(user => {
                 passwords.forEach(password => {
                     const score = calculateAkuratScore(user, password);
                     if (score >= threshold) {
-                        matches.push({ 
-                            user, 
-                            password, 
-                            score,
-                            status: 'pending'
-                        });
+                        matches.push({ user, password, score, status: 'pending' });
                     }
                 });
             });
 
-            // Urutin per user
             matches.sort((a, b) => {
                 if (a.user === b.user) return b.score - a.score;
                 return a.user.localeCompare(b.user);
             });
 
-            // Save ke localStorage
             saveToLocalStorage();
-
-            // Update UI
             updateUserList();
             updateFilterButtons();
 
-            // Reset selected user
             selectedUser = null;
             currentIndex = 0;
             
@@ -942,7 +837,6 @@
                 return;
             }
 
-            // Hitung status per user
             const userStats = {};
             users.forEach(user => {
                 userStats[user] = { total: 0, success: 0, failed: 0, pending: 0 };
@@ -982,7 +876,6 @@
             selectedUser = user;
             document.getElementById('selected-user-display').innerText = user;
             
-            // Update selected state
             document.querySelectorAll('.user-item').forEach(el => {
                 if (el.getAttribute('data-user') === user) {
                     el.classList.add('selected');
@@ -991,7 +884,6 @@
                 }
             });
 
-            // Filter matches
             const userMatches = getFilteredMatchesForUser(user);
             
             if (userMatches.length > 0) {
@@ -1005,7 +897,6 @@
                 updateNavButtons(userMatches.length);
                 updateStatusCounts(user);
                 
-                // Save selection ke storage
                 saveToLocalStorage();
             } else {
                 document.getElementById('password-slider').style.display = 'none';
@@ -1024,7 +915,6 @@
         function getFilteredMatchesForUser(user) {
             let userMatches = matches.filter(m => m.user === user);
             
-            // Apply filter
             if (currentFilter === 'success') {
                 userMatches = userMatches.filter(m => m.status === 'success');
             } else if (currentFilter === 'failed') {
@@ -1045,15 +935,14 @@
                 const card = document.createElement('div');
                 card.className = `password-card glass p-4 rounded-xl border ${match.status}`;
                 card.setAttribute('data-index', index);
+                card.setAttribute('data-user', match.user);
                 card.setAttribute('data-password', match.password);
                 card.setAttribute('data-status', match.status);
                 
-                // Match badge color based on score
                 let badgeClass = 'from-green-500 to-green-600';
                 if (match.score < 60) badgeClass = 'from-yellow-500 to-yellow-600';
                 if (match.score < 40) badgeClass = 'from-red-500 to-red-600';
                 
-                // Tambahin detail kecocokan
                 let matchDetail = '';
                 if (match.score >= 80) matchDetail = '🔴 SANGAT COCOK';
                 else if (match.score >= 60) matchDetail = '🟡 COCOK';
@@ -1082,7 +971,6 @@
                 slider.appendChild(card);
             });
 
-            // Scroll ke index yang aktif
             setTimeout(() => {
                 const cards = slider.children;
                 if (cards.length > 0 && currentIndex < cards.length) {
@@ -1099,7 +987,6 @@
                 document.getElementById('current-pass-display').innerText = current.password;
                 document.getElementById('password-counter').innerText = `${currentIndex + 1}/${userMatches.length}`;
                 
-                // Tampilkan/sembunyikan tombol konfirmasi berdasarkan status
                 if (current.status === 'pending') {
                     document.getElementById('success-btn').style.display = 'block';
                     document.getElementById('failed-btn').style.display = 'block';
@@ -1181,87 +1068,93 @@
             }
         }
 
-        // ==================== INSTANT COPY (TANPA JEDA) ====================
-        function startInstantCopy() {
+        // ==================== INSTANT COPY USER & PASSWORD (FIXED) ====================
+        function copyUserThenPassword() {
             if (!selectedUser) {
                 showToast('PILIH USER DULU!', 1500);
                 return;
             }
 
             const userMatches = getFilteredMatchesForUser(selectedUser);
-            if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
+            if (userMatches.length === 0 || currentIndex >= userMatches.length) {
+                showToast('TIDAK ADA PASSWORD DIPILIH!', 1500);
+                return;
+            }
 
-            // Cek apakah sedang dalam proses copy
             if (isCopying) {
                 showToast('⏳ Sedang dalam proses copy, tunggu!', 1500);
                 return;
             }
 
             const current = userMatches[currentIndex];
+            const user = current.user;
+            const password = current.password;
             
-            // Tampilkan status copy
+            // Tampilkan status
             document.getElementById('copy-status-container').style.display = 'block';
-            document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-user"></i> Menyalin USER: ${current.user}`;
+            document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-user"></i> Menyalin USER: ${user}`;
             
-            // Disable tombol copy selama proses
+            // Disable tombol
             document.getElementById('copy-current-btn').disabled = true;
             document.getElementById('copy-current-btn').classList.add('opacity-50', 'cursor-not-allowed');
             
             isCopying = true;
             
-            // STEP 1: Copy USER dulu
-            navigator.clipboard.writeText(current.user).then(() => {
-                showToast(`✅ USER COPIED: ${current.user}`, 1000);
+            // STEP 1: Copy USER
+            navigator.clipboard.writeText(user).then(() => {
+                showToast(`✅ USER COPIED: ${user}`, 1000);
                 
                 // Update status
-                document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-key"></i> Menyalin PASSWORD...`;
+                document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-key"></i> Menyalin PASSWORD: ${password}`;
                 
-                // Auto open roblox setelah copy user
+                // Auto open roblox setelah copy user (opsional)
                 if (document.getElementById('auto-open').checked) {
                     window.open('https://www.roblox.com/login', '_blank');
                 }
                 
-                // STEP 2: Langsung copy password TANPA JEDA
+                // STEP 2: Langsung copy password (tanpa delay)
+                // Gunakan setTimeout pendek untuk memastikan clipboard user sudah selesai
                 setTimeout(() => {
-                    navigator.clipboard.writeText(current.password).then(() => {
-                        showToast(`✅ PASSWORD COPIED: ${current.password}`, 1500);
+                    navigator.clipboard.writeText(password).then(() => {
+                        showToast(`✅ PASSWORD COPIED: ${password}`, 1500);
                         
-                        // Update status
-                        document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-check-circle text-green-400"></i> Selesai! Menampilkan konfirmasi...`;
+                        // Update status sukses
+                        document.getElementById('copy-status-text').innerHTML = `<i class="fas fa-check-circle text-green-400"></i> Selesai! USER & PASSWORD ter-copy`;
                         
-                        // Sembunyikan status copy setelah 1 detik
+                        // Sembunyikan status setelah 1.5 detik
                         setTimeout(() => {
                             document.getElementById('copy-status-container').style.display = 'none';
-                        }, 1000);
+                        }, 1500);
                         
                         // Tampilkan modal konfirmasi
-                        showConfirmModal(current);
+                        setTimeout(() => {
+                            showConfirmModal(current);
+                        }, 500);
                         
                         // Tandai card sebagai copied
                         const slider = document.getElementById('password-slider');
                         const cards = slider.children;
                         if (cards.length > currentIndex) {
                             cards[currentIndex].classList.add('copied');
-                            setTimeout(() => {
-                                cards[currentIndex].classList.remove('copied');
-                            }, 2000);
                         }
                         
-                        // Reset state
+                        // Reset state tombol
                         document.getElementById('copy-current-btn').disabled = false;
                         document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
                         isCopying = false;
                         
                     }).catch(err => {
+                        console.error('Gagal copy password:', err);
                         showToast('❌ GAGAL COPY PASSWORD!', 1500);
                         document.getElementById('copy-status-container').style.display = 'none';
                         document.getElementById('copy-current-btn').disabled = false;
                         document.getElementById('copy-current-btn').classList.remove('opacity-50', 'cursor-not-allowed');
                         isCopying = false;
                     });
-                }, 100); // Kasih delay 100ms biar ga kecepatan (tapi hampir instant)
+                }, 200); // Delay 200ms biar aman
                 
             }).catch(err => {
+                console.error('Gagal copy user:', err);
                 showToast('❌ GAGAL COPY USER!', 1500);
                 document.getElementById('copy-status-container').style.display = 'none';
                 document.getElementById('copy-current-btn').disabled = false;
@@ -1288,44 +1181,27 @@
 
         function confirmSuccess() {
             if (currentConfirmMatch) {
-                // Update status di matches
                 const match = matches.find(m => 
                     m.user === currentConfirmMatch.user && 
                     m.password === currentConfirmMatch.password
                 );
-                if (match) {
-                    match.status = 'success';
-                }
+                if (match) match.status = 'success';
                 
                 showToast('✅ Ditandai sebagai BERHASIL LOGIN!', 1500);
                 closeModal();
-                
-                // Save ke storage
                 saveToLocalStorage();
                 
-                // Refresh UI
                 if (selectedUser) {
                     updateStatusCounts(selectedUser);
                     updateUserList();
                     
-                    // Refresh slider dengan filter yang sama
                     const userMatches = getFilteredMatchesForUser(selectedUser);
                     if (userMatches.length > 0) {
                         renderPasswordSlider(userMatches);
                         updateCurrentDisplay(userMatches);
-                        
-                        // Auto lanjut ke next
-                        setTimeout(() => {
-                            slideNext();
-                        }, 300);
-                    } else {
-                        // Kalau ga ada hasil dengan filter ini, reset ke filter all
-                        if (currentFilter !== 'all') {
-                            filterResults('all');
-                        } else {
-                            document.getElementById('password-slider').style.display = 'none';
-                            document.getElementById('no-password-selected').style.display = 'block';
-                        }
+                        setTimeout(() => slideNext(), 300);
+                    } else if (currentFilter !== 'all') {
+                        filterResults('all');
                     }
                 }
             }
@@ -1333,44 +1209,27 @@
 
         function confirmFailed() {
             if (currentConfirmMatch) {
-                // Update status di matches
                 const match = matches.find(m => 
                     m.user === currentConfirmMatch.user && 
                     m.password === currentConfirmMatch.password
                 );
-                if (match) {
-                    match.status = 'failed';
-                }
+                if (match) match.status = 'failed';
                 
                 showToast('❌ Ditandai sebagai TIDAK COCOK', 1500);
                 closeModal();
-                
-                // Save ke storage
                 saveToLocalStorage();
                 
-                // Refresh UI
                 if (selectedUser) {
                     updateStatusCounts(selectedUser);
                     updateUserList();
                     
-                    // Refresh slider dengan filter yang sama
                     const userMatches = getFilteredMatchesForUser(selectedUser);
                     if (userMatches.length > 0) {
                         renderPasswordSlider(userMatches);
                         updateCurrentDisplay(userMatches);
-                        
-                        // Auto lanjut ke next
-                        setTimeout(() => {
-                            slideNext();
-                        }, 300);
-                    } else {
-                        // Kalau ga ada hasil dengan filter ini, reset ke filter all
-                        if (currentFilter !== 'all') {
-                            filterResults('all');
-                        } else {
-                            document.getElementById('password-slider').style.display = 'none';
-                            document.getElementById('no-password-selected').style.display = 'block';
-                        }
+                        setTimeout(() => slideNext(), 300);
+                    } else if (currentFilter !== 'all') {
+                        filterResults('all');
                     }
                 }
             }
@@ -1380,16 +1239,11 @@
         function filterResults(filter) {
             currentFilter = filter;
             
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`filter-${filter}`).classList.add('active');
             
-            // Save filter ke storage
             saveToLocalStorage();
             
-            // Kalau ada user yang dipilih, refresh tampilan
             if (selectedUser) {
                 const userMatches = getFilteredMatchesForUser(selectedUser);
                 
@@ -1419,13 +1273,11 @@
         }
 
         function updateFilterButtons() {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('filter-all').classList.add('active');
         }
 
-        // ==================== MARK AS (Tombol cepat) ====================
+        // ==================== MARK AS ====================
         function markAsSuccess() {
             if (!selectedUser) return;
             
@@ -1433,41 +1285,23 @@
             if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
             
             const current = userMatches[currentIndex];
-            
-            // Update status
-            const match = matches.find(m => 
-                m.user === current.user && 
-                m.password === current.password
-            );
-            if (match) {
-                match.status = 'success';
-            }
+            const match = matches.find(m => m.user === current.user && m.password === current.password);
+            if (match) match.status = 'success';
             
             showToast('✅ Ditandai BERHASIL!', 1000);
-            
-            // Save ke storage
             saveToLocalStorage();
             
-            // Refresh
             updateStatusCounts(selectedUser);
             updateUserList();
             
-            // Refresh slider
             const newUserMatches = getFilteredMatchesForUser(selectedUser);
             if (newUserMatches.length > 0) {
                 renderPasswordSlider(newUserMatches);
-                
-                // Kalau current index masih valid, stay di situ, kalau tidak ke 0
-                if (currentIndex >= newUserMatches.length) {
-                    currentIndex = 0;
-                }
+                if (currentIndex >= newUserMatches.length) currentIndex = 0;
                 updateCurrentDisplay(newUserMatches);
                 updateNavButtons(newUserMatches.length);
-            } else {
-                // Kalau ga ada hasil, reset filter
-                if (currentFilter !== 'all') {
-                    filterResults('all');
-                }
+            } else if (currentFilter !== 'all') {
+                filterResults('all');
             }
         }
 
@@ -1478,41 +1312,23 @@
             if (userMatches.length === 0 || currentIndex >= userMatches.length) return;
             
             const current = userMatches[currentIndex];
-            
-            // Update status
-            const match = matches.find(m => 
-                m.user === current.user && 
-                m.password === current.password
-            );
-            if (match) {
-                match.status = 'failed';
-            }
+            const match = matches.find(m => m.user === current.user && m.password === current.password);
+            if (match) match.status = 'failed';
             
             showToast('❌ Ditandai GAGAL', 1000);
-            
-            // Save ke storage
             saveToLocalStorage();
             
-            // Refresh
             updateStatusCounts(selectedUser);
             updateUserList();
             
-            // Refresh slider
             const newUserMatches = getFilteredMatchesForUser(selectedUser);
             if (newUserMatches.length > 0) {
                 renderPasswordSlider(newUserMatches);
-                
-                // Kalau current index masih valid, stay di situ, kalau tidak ke 0
-                if (currentIndex >= newUserMatches.length) {
-                    currentIndex = 0;
-                }
+                if (currentIndex >= newUserMatches.length) currentIndex = 0;
                 updateCurrentDisplay(newUserMatches);
                 updateNavButtons(newUserMatches.length);
-            } else {
-                // Kalau ga ada hasil, reset filter
-                if (currentFilter !== 'all') {
-                    filterResults('all');
-                }
+            } else if (currentFilter !== 'all') {
+                filterResults('all');
             }
         }
 
@@ -1523,20 +1339,16 @@
                 return;
             }
             
-            // Hitung statistik
             const total = matches.length;
             const success = matches.filter(m => m.status === 'success').length;
             const failed = matches.filter(m => m.status === 'failed').length;
             const pending = matches.filter(m => m.status === 'pending').length;
-            
-            // Hitung rata-rata score
             const avgScore = matches.length > 0 ? Math.round(matches.reduce((sum, m) => sum + m.score, 0) / matches.length) : 0;
             
-            // Buat laporan
             const report = `
 ═══════════════════════════
-   XREZZKY Ω-CHECKER v42.0
-   INSTANT COPY EDITION
+   XREZZKY Ω-CHECKER v43.0
+   FIXED INSTANT COPY EDITION
 ═══════════════════════════
 
 📊 HASIL ANALISIS:
@@ -1563,7 +1375,7 @@ ${users.map(user => {
 ${matches.filter(m => m.status === 'success').map(m => `${m.user}:${m.password} [${m.score}%]`).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━
-⚡ INSTANT COPY: USER → LANGSUNG → PASSWORD (tanpa jeda)
+⚡ INSTANT COPY FIXED: USER → LANGSUNG → PASSWORD (sesuai pilihan)
 💾 DATA TERSIMPAN LOKAL
 ⏰ ${new Date().toLocaleString()}
 
@@ -1574,33 +1386,68 @@ Jika tidak akurat dengan akun asli, itu bukan urusan kami.
 Web khusus PG - Password Generator/Checker.
             `;
             
-            // Tampilkan di console
             console.log(report);
-            
-            // Copy ke clipboard
             navigator.clipboard.writeText(report).then(() => {
                 showToast('📋 Laporan hasil dicopy ke clipboard!', 2000);
             });
             
-            // Alert ringkas
-            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n⚡ INSTANT COPY: USER langsung PASSWORD\n\n📋 Detail sudah di clipboard!\n\n⚠️ Disclaimer: Kami hanya mengecek kecocokan, ketidakakuratan bukan urusan kami.`);
+            alert(`📊 HASIL:\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}\n⏳ Pending: ${pending}\n🎯 Rata-rata: ${avgScore}%\n\n⚡ INSTANT COPY FIXED: USER langsung PASSWORD sesuai pilihan\n\n📋 Detail sudah di clipboard!\n\n⚠️ Disclaimer: Kami hanya mengecek kecocokan.`);
+        }
+
+        // ==================== CLEAR ALL DATA ====================
+        function clearAllData() {
+            if (confirm('⚠️ Yakin mau hapus SEMUA data?\n\n- Input users & passwords\n- Semua hasil analisis\n- Status login\n- Data tersimpan di device ini')) {
+                
+                document.getElementById('user-input').value = '';
+                document.getElementById('pass-input').value = '';
+                
+                users = [];
+                passwords = [];
+                matches = [];
+                selectedUser = null;
+                currentIndex = 0;
+                currentFilter = 'all';
+                
+                localStorage.removeItem(STORAGE_KEY);
+                
+                document.getElementById('user-list').innerHTML = '<div class="text-gray-600 text-sm w-full text-center">Belum ada data. Isi username & password lalu PROCESS!</div>';
+                document.getElementById('selected-user-display').innerText = '-';
+                document.getElementById('current-user-display').innerText = '-';
+                document.getElementById('current-pass-display').innerText = '-';
+                document.getElementById('password-slider').style.display = 'none';
+                document.getElementById('no-password-selected').style.display = 'block';
+                document.getElementById('no-password-selected').innerHTML = `
+                    <i class="fas fa-arrow-left text-3xl mb-3"></i>
+                    <p class="text-sm">Pilih user dulu dari daftar di atas</p>
+                `;
+                document.getElementById('success-btn').style.display = 'none';
+                document.getElementById('failed-btn').style.display = 'none';
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('password-counter').innerText = '0/0';
+                document.getElementById('success-count').innerText = '0';
+                document.getElementById('failed-count').innerText = '0';
+                document.getElementById('pending-count').innerText = '0';
+                document.getElementById('last-saved').innerText = '-';
+                
+                updateFilterButtons();
+                updateCounts();
+                showToast('🧹 SEMUA DATA DIHAPUS!', 2000);
+            }
         }
 
         // ==================== INIT ====================
         document.getElementById('user-input').addEventListener('input', updateCounts);
         document.getElementById('pass-input').addEventListener('input', updateCounts);
         
-        // Auto-update threshold label
         updateThresholdLabel();
 
-        // Load data dari localStorage saat startup
         window.onload = function() {
             const hasData = loadFromLocalStorage();
             
             if (!hasData) {
-                // Kosong total, ga ada contoh
                 updateCounts();
-                showToast('🟢 XREZZKY V42.0 READY - INSTANT COPY', 2000);
+                showToast('🟢 XREZZKY V43.0 READY - INSTANT COPY FIXED', 2000);
             } else {
                 showToast('🟢 Data dimuat dari penyimpanan lokal', 2000);
             }
@@ -1608,7 +1455,6 @@ Web khusus PG - Password Generator/Checker.
             updateFilterButtons();
         };
 
-        // Simpan data sebelum user meninggalkan halaman
         window.addEventListener('beforeunload', function() {
             saveToLocalStorage();
         });
