@@ -320,14 +320,29 @@
             </p>
         </div>
         <div class="flex gap-2">
-            <button onclick="clearAllData()" class="clear-btn px-4 py-2 rounded-xl text-xs font-bold text-white hover:scale-105 transition-all flex items-center gap-2">
-                <i class="fas fa-trash-alt mr-1"></i> CLEAR ALL DATA
-            </button>
-            <button onclick="showResults()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all border border-purple-500/50">
-                <i class="fas fa-chart-bar mr-2"></i> HASIL
-            </button>
-        </div>
-    </div>
+    <!-- EXPORT BUTTON -->
+    <button onclick="exportData()" class="glass px-3 py-2 rounded-xl text-xs hover:bg-white/10 transition-all border border-green-500/30">
+        <i class="fas fa-download text-green-400 mr-1"></i> EXPORT
+    </button>
+    <!-- IMPORT BUTTON -->
+    <button onclick="importData()" class="glass px-3 py-2 rounded-xl text-xs hover:bg-white/10 transition-all border border-blue-500/30">
+        <i class="fas fa-upload text-blue-400 mr-1"></i> IMPORT
+    </button>
+    <!-- CLEAR ALL DATA BUTTON -->
+    <button onclick="clearAllData()" class="clear-btn px-4 py-2 rounded-xl text-xs font-bold text-white hover:scale-105 transition-all flex items-center gap-2">
+        <i class="fas fa-trash-alt mr-1"></i> CLEAR ALL
+    </button>
+    
+    <!-- LOCK BUTTON -->
+<button onclick="lockApp()" class="glass px-3 py-2 rounded-xl text-xs hover:bg-white/10 transition-all border border-yellow-500/30">
+    <i class="fas fa-lock text-yellow-400 mr-1"></i> LOCK
+</button>
+    
+    <!-- HASIL BUTTON -->
+    <button onclick="showResults()" class="glass px-4 py-2 rounded-xl text-xs hover:bg-white/5 transition-all border border-purple-500/50">
+        <i class="fas fa-chart-bar mr-2"></i> HASIL
+    </button>
+</div>
 
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
@@ -392,6 +407,62 @@
                         <span><i class="fas fa-save mr-1"></i> Auto-save setiap perubahan</span>
                         <span id="last-saved" class="text-green-500/50">-</span>
                     </div>
+                    
+                    <!-- STATISTIK CHART -->
+<div class="glass-dark p-4 rounded-2xl mt-3">
+    <h4 class="text-xs font-bold mb-2 flex items-center gap-2">
+        <i class="fas fa-chart-pie text-green-400"></i> STATISTIK REAL-TIME
+    </h4>
+    
+    <!-- PROGRESS BAR SUKSES -->
+    <div class="mb-2">
+        <div class="flex justify-between text-[8px] mb-1">
+            <span>✅ Berhasil</span>
+            <span id="stat-success-pct">0%</span>
+        </div>
+        <div class="w-full bg-white/5 rounded-full h-1.5">
+            <div id="stat-success-bar" class="bg-green-500 h-1.5 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    <!-- PROGRESS BAR GAGAL -->
+    <div class="mb-2">
+        <div class="flex justify-between text-[8px] mb-1">
+            <span>❌ Gagal</span>
+            <span id="stat-failed-pct">0%</span>
+        </div>
+        <div class="w-full bg-white/5 rounded-full h-1.5">
+            <div id="stat-failed-bar" class="bg-red-500 h-1.5 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    <!-- PROGRESS BAR PENDING -->
+    <div class="mb-2">
+        <div class="flex justify-between text-[8px] mb-1">
+            <span>⏳ Pending</span>
+            <span id="stat-pending-pct">0%</span>
+        </div>
+        <div class="w-full bg-white/5 rounded-full h-1.5">
+            <div id="stat-pending-bar" class="bg-yellow-500 h-1.5 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    <!-- STATS ANGKA -->
+    <div class="grid grid-cols-3 gap-1 mt-3 text-center">
+        <div class="bg-white/5 p-2 rounded-lg">
+            <div class="text-[8px] text-gray-400">TOTAL</div>
+            <div class="text-sm font-bold" id="stat-total">0</div>
+        </div>
+        <div class="bg-white/5 p-2 rounded-lg">
+            <div class="text-[8px] text-gray-400">RATA²</div>
+            <div class="text-sm font-bold" id="stat-avg">0%</div>
+        </div>
+        <div class="bg-white/5 p-2 rounded-lg">
+            <div class="text-[8px] text-gray-400">TERTINGGI</div>
+            <div class="text-sm font-bold" id="stat-max">0%</div>
+        </div>
+    </div>
+</div>
 
                     <!-- INFO PANEL - DISCLAIMER -->
                     <div class="info-panel mt-4">
@@ -424,6 +495,12 @@
                     <h3 class="text-sm font-bold flex items-center gap-2">
                         <i class="fas fa-users text-blue-500"></i> USER LIST
                     </h3>
+                    
+                    <div class="flex gap-1">
+    <!-- MULTI SELECT BUTTON -->
+    <button onclick="toggleMultiSelect()" class="glass px-3 py-1 rounded-lg text-xs border border-pink-500/30 hover:bg-pink-500/10">
+        <i class="fas fa-check-double text-pink-400 mr-1"></i> MULTI
+    </button>
                     
                     <!-- FILTER BUTTONS -->
                     <div class="flex gap-1">
@@ -480,6 +557,30 @@
                         <i class="fas fa-bolt text-green-400"></i> <span id="copy-status-text">Menyalin user...</span>
                     </div>
                 </div>
+                
+                <!-- COPY STATUS INDICATOR -->
+<div id="copy-status-container" class="px-5 pt-2" style="display: none;">
+    <div class="copy-status">
+        <i class="fas fa-bolt text-green-400"></i> <span id="copy-status-text">Menyalin user...</span>
+    </div>
+</div>
+
+<!-- MULTI-SELECT BAR (AWALNYA HIDDEN) -->
+<div id="multi-select-bar" class="px-5 pt-2 flex justify-between items-center" style="display: none;">
+    <div class="flex items-center gap-2">
+        <span class="text-xs bg-pink-500/20 px-3 py-1 rounded-full">
+            <span id="selected-count">0</span> terpilih
+        </span>
+    </div>
+    <div class="flex gap-2">
+        <button onclick="copySelected()" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-lg text-xs font-bold">
+            <i class="fas fa-copy mr-1"></i> COPY SELECTED
+        </button>
+        <button onclick="cancelMultiSelect()" class="glass px-3 py-1 rounded-lg text-xs">
+            BATAL
+        </button>
+    </div>
+</div>
 
                 <!-- Password Slider -->
                 <div class="p-5 pt-2">
@@ -559,6 +660,25 @@
             </button>
         </div>
     </div>
+    
+    <!-- CONFIRMATION MODAL -->
+<div id="confirm-modal" class="confirm-modal" style="display: none;">
+    ...
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-modal" class="confirm-modal" style="display: none;">
+    <div class="confirm-card glass p-6 rounded-3xl">
+        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <i class="fas fa-lock text-yellow-500"></i> MASUKKAN PIN
+        </h3>
+        <input type="password" id="pin-input" maxlength="4" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-center text-2xl mono focus:outline-none focus:border-yellow-500" placeholder="****">
+        <div class="flex gap-2 mt-4">
+            <button onclick="unlockApp()" class="flex-1 bg-yellow-600 hover:bg-yellow-700 py-3 rounded-xl font-bold">BUKA</button>
+            <button onclick="closePinModal()" class="flex-1 glass py-3 rounded-xl">BATAL</button>
+        </div>
+    </div>
+</div>
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 glass px-8 py-3 rounded-full text-xs font-bold opacity-0 transition-all translate-y-10 pointer-events-none z-50 border border-white/10">
@@ -1458,6 +1578,270 @@ Web khusus PG - Password Generator/Checker.
         window.addEventListener('beforeunload', function() {
             saveToLocalStorage();
         });
+        
+        // ==================== FITUR 1: EXPORT/IMPORT ====================
+function exportData() {
+    try {
+        const data = {
+            users: users,
+            passwords: passwords,
+            matches: matches,
+            exportDate: new Date().toISOString(),
+            version: 'v43.0'
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `xrezzky_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        
+        showToast('📦 Data berhasil diexport!', 2000);
+    } catch (e) {
+        showToast('❌ Gagal export!', 1500);
+    }
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(ev) {
+            try {
+                const data = JSON.parse(ev.target.result);
+                
+                if (data.users && data.passwords) {
+                    users = data.users || [];
+                    passwords = data.passwords || [];
+                    matches = data.matches || [];
+                    
+                    document.getElementById('user-input').value = users.join('\n');
+                    document.getElementById('pass-input').value = passwords.join('\n');
+                    
+                    saveToLocalStorage();
+                    updateUserList();
+                    updateCounts();
+                    updateStatistics(); // Update statistik
+                    
+                    showToast(`✅ Import sukses! ${matches.length} kombinasi`, 2000);
+                } else {
+                    showToast('❌ File tidak valid!', 2000);
+                }
+            } catch (err) {
+                showToast('❌ Gagal import!', 2000);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
+
+// ==================== FITUR 3: MULTI-SELECT ====================
+let multiSelectMode = false;
+let selectedIndexes = new Set();
+
+function toggleMultiSelect() {
+    multiSelectMode = !multiSelectMode;
+    selectedIndexes.clear();
+    
+    document.getElementById('multi-select-bar').style.display = multiSelectMode ? 'flex' : 'none';
+    document.getElementById('password-counter').style.display = multiSelectMode ? 'none' : 'flex';
+    
+    // Sembunyikan tombol copy biasa saat multi-select
+    document.getElementById('copy-current-btn').style.display = multiSelectMode ? 'none' : 'flex';
+    
+    const userMatches = getFilteredMatchesForUser(selectedUser);
+    if (userMatches.length > 0) {
+        if (multiSelectMode) {
+            renderPasswordSliderMulti(userMatches);
+        } else {
+            renderPasswordSlider(userMatches);
+        }
+    }
+    
+    showToast(multiSelectMode ? '✅ Mode multi-select aktif' : 'Mode multi-select nonaktif', 1000);
+}
+
+function renderPasswordSliderMulti(userMatches) {
+    const slider = document.getElementById('password-slider');
+    slider.innerHTML = '';
+
+    userMatches.forEach((match, index) => {
+        const card = document.createElement('div');
+        card.className = `password-card glass p-4 rounded-xl border ${match.status} relative`;
+        card.setAttribute('data-index', index);
+        
+        const isSelected = selectedIndexes.has(index);
+        
+        let badgeClass = 'from-green-500 to-green-600';
+        if (match.score < 60) badgeClass = 'from-yellow-500 to-yellow-600';
+        if (match.score < 40) badgeClass = 'from-red-500 to-red-600';
+        
+        card.innerHTML = `
+            <div class="absolute top-2 left-2">
+                <input type="checkbox" class="password-checkbox accent-pink-500 w-4 h-4" data-index="${index}" ${isSelected ? 'checked' : ''}>
+            </div>
+            <div class="flex justify-between items-start mt-4 mb-3">
+                <span class="match-badge bg-gradient-to-r ${badgeClass}">${match.score}%</span>
+            </div>
+            <div class="mono text-sm mb-4 break-all min-h-[60px] pl-6">${match.password}</div>
+            <div class="flex justify-between items-center">
+                <span class="text-[8px] ${statusColors[match.status]}">
+                    ${match.status === 'success' ? '✓ BERHASIL' : match.status === 'failed' ? '✗ GAGAL' : '⏳ PENDING'}
+                </span>
+                <span class="text-[8px] text-gray-500">#${index + 1}</span>
+            </div>
+        `;
+        
+        const checkbox = card.querySelector('.password-checkbox');
+        checkbox.addEventListener('change', function(e) {
+            const idx = parseInt(this.dataset.index);
+            if (this.checked) {
+                selectedIndexes.add(idx);
+            } else {
+                selectedIndexes.delete(idx);
+            }
+            document.getElementById('selected-count').innerText = selectedIndexes.size;
+        });
+        
+        slider.appendChild(card);
+    });
+}
+
+function copySelected() {
+    if (selectedIndexes.size === 0) {
+        showToast('Pilih minimal 1 password!', 1500);
+        return;
+    }
+    
+    const userMatches = getFilteredMatchesForUser(selectedUser);
+    const selectedCombos = [];
+    
+    selectedIndexes.forEach(index => {
+        if (index < userMatches.length) {
+            const match = userMatches[index];
+            selectedCombos.push(`${match.user}:${match.password}`);
+        }
+    });
+    
+    const textToCopy = selectedCombos.join('\n');
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast(`✅ Copied ${selectedIndexes.size} combos!`, 1500);
+        toggleMultiSelect(); // Keluar dari mode multi-select
+    }).catch(() => {
+        showToast('❌ Gagal copy!', 1500);
+    });
+}
+
+function cancelMultiSelect() {
+    toggleMultiSelect();
+}
+
+// ==================== FITUR 4: PIN LOCK ====================
+let appLocked = false;
+const PIN = '1234'; // Ganti sesuai keinginan
+let lastActiveTime = Date.now();
+
+function lockApp() {
+    appLocked = true;
+    document.getElementById('pin-modal').style.display = 'flex';
+    
+    // Disable semua interaksi
+    document.querySelectorAll('.glass, button, textarea, input').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.style.opacity = '0.5';
+    });
+    
+    showToast('🔒 App terkunci', 1000);
+}
+
+function unlockApp() {
+    const enteredPin = document.getElementById('pin-input').value;
+    
+    if (enteredPin === PIN) {
+        appLocked = false;
+        closePinModal();
+        
+        // Enable kembali interaksi
+        document.querySelectorAll('.glass, button, textarea, input').forEach(el => {
+            el.style.pointerEvents = 'auto';
+            el.style.opacity = '1';
+        });
+        
+        showToast('🔓 App terbuka', 1000);
+    } else {
+        showToast('❌ PIN salah!', 1000);
+        document.getElementById('pin-input').value = '';
+    }
+}
+
+function closePinModal() {
+    document.getElementById('pin-modal').style.display = 'none';
+    document.getElementById('pin-input').value = '';
+}
+
+// Auto lock setelah 5 menit tidak aktif
+setInterval(() => {
+    const now = Date.now();
+    if (!appLocked && now - lastActiveTime > 300000) { // 5 menit
+        lockApp();
+    }
+}, 10000);
+
+// Update last active time
+document.addEventListener('click', () => { lastActiveTime = Date.now(); });
+document.addEventListener('keypress', () => { lastActiveTime = Date.now(); });
+document.addEventListener('mousemove', () => { lastActiveTime = Date.now(); });
+
+// ==================== FITUR 5: STATISTIK ====================
+function updateStatistics() {
+    const total = matches.length;
+    if (total === 0) {
+        document.getElementById('stat-total').innerText = '0';
+        document.getElementById('stat-avg').innerText = '0%';
+        document.getElementById('stat-max').innerText = '0%';
+        document.getElementById('stat-success-pct').innerText = '0%';
+        document.getElementById('stat-failed-pct').innerText = '0%';
+        document.getElementById('stat-pending-pct').innerText = '0%';
+        document.getElementById('stat-success-bar').style.width = '0%';
+        document.getElementById('stat-failed-bar').style.width = '0%';
+        document.getElementById('stat-pending-bar').style.width = '0%';
+        return;
+    }
+    
+    const success = matches.filter(m => m.status === 'success').length;
+    const failed = matches.filter(m => m.status === 'failed').length;
+    const pending = matches.filter(m => m.status === 'pending').length;
+    
+    const successPct = Math.round((success / total) * 100);
+    const failedPct = Math.round((failed / total) * 100);
+    const pendingPct = Math.round((pending / total) * 100);
+    
+    const avgScore = Math.round(matches.reduce((sum, m) => sum + m.score, 0) / total);
+    const maxScore = Math.max(...matches.map(m => m.score));
+    
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-avg').innerText = avgScore + '%';
+    document.getElementById('stat-max').innerText = maxScore + '%';
+    
+    document.getElementById('stat-success-pct').innerText = successPct + '%';
+    document.getElementById('stat-failed-pct').innerText = failedPct + '%';
+    document.getElementById('stat-pending-pct').innerText = pendingPct + '%';
+    
+    document.getElementById('stat-success-bar').style.width = successPct + '%';
+    document.getElementById('stat-failed-bar').style.width = failedPct + '%';
+    document.getElementById('stat-pending-bar').style.width = pendingPct + '%';
+}
+        
     </script>
 </body>
-</html>
+    </html>
