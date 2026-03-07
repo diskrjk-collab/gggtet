@@ -958,7 +958,7 @@ function loadTestimoni() {
     });
 }
 
-// ========== CEK PESANAN REALTIME (FIX VERSION) ==========
+// ========== CEK PESANAN REALTIME (DENGAN DETAIL LENGKAP & ULASAN) ==========
 function cekPesananRealtime() {
     const idPesanan = document.getElementById('cekIdPesanan').value.trim();
     const resultDiv = document.getElementById('cekPesananResult');
@@ -1028,6 +1028,11 @@ function cekPesananRealtime() {
                 `;
             }
             
+            // Detail lengkap produk
+            const hargaSatuan = order.produkHarga || 0;
+            const jumlah = order.jumlah || 1;
+            const total = order.total || (hargaSatuan * jumlah);
+            
             let paymentInfo = '';
             if(order.status === 'menunggu-pembayaran') {
                 paymentInfo = `
@@ -1036,7 +1041,7 @@ function cekPesananRealtime() {
                         <p class="text-sm">Transfer ke rekening:</p>
                         <p class="font-mono font-bold">BCA 1234567890</p>
                         <p class="text-sm">a.n. Jamu Herbal Alami</p>
-                        <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${(order.total || 0).toLocaleString()}</span></p>
+                        <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${total.toLocaleString()}</span></p>
                         <p class="text-xs text-red-600 mt-2">*Pesanan akan hangus dalam 10 menit jika tidak dibayar</p>
                     </div>
                 `;
@@ -1063,15 +1068,53 @@ function cekPesananRealtime() {
                 `;
             }
             
+            // 🔴 TOMBOL ULASAN MUNCUL HANYA JIKA STATUS SELESAI DAN BELUM PERNAH ULASAN
             let reviewButton = '';
             if(order.status === 'selesai' && !order.dapatUlasan) {
                 reviewButton = `
-                    <button onclick="bukaReviewModal('${orderId}', '${order.produkId}', '${order.produkNama.replace(/'/g, "\\'")}')" 
-                            class="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
-                        <i class="fas fa-star mr-2"></i>Beri Ulasan
-                    </button>
+                    <div class="mt-4 p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                        <p class="font-semibold text-purple-800 mb-3">⭐ Belum kasih ulasan?</p>
+                        <button onclick="bukaReviewModal('${orderId}', '${order.produkId}', '${order.produkNama.replace(/'/g, "\\'")}')" 
+                                class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-semibold transition-all">
+                            <i class="fas fa-star mr-2"></i>Beri Ulasan Sekarang
+                        </button>
+                    </div>
+                `;
+            } else if(order.status === 'selesai' && order.dapatUlasan) {
+                reviewButton = `
+                    <div class="mt-4 p-3 bg-gray-50 rounded-lg text-center">
+                        <i class="fas fa-check-circle text-green-500 text-xl mb-1"></i>
+                        <p class="text-sm text-gray-600">Terima kasih! Ulasan sudah diberikan.</p>
+                    </div>
                 `;
             }
+            
+            // Detail pesanan lengkap untuk status PROSES
+            let detailPesanan = `
+                <div class="border-t pt-3">
+                    <p class="font-semibold mb-2">📦 Detail Pesanan:</p>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <table class="w-full text-sm">
+                            <tr>
+                                <td class="py-1 text-gray-600">Nama Produk</td>
+                                <td class="py-1 font-medium">: ${order.produkNama}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 text-gray-600">Harga Satuan</td>
+                                <td class="py-1 font-medium">: Rp ${hargaSatuan.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 text-gray-600">Jumlah</td>
+                                <td class="py-1 font-medium">: ${jumlah} pcs</td>
+                            </tr>
+                            <tr class="border-t border-gray-300">
+                                <td class="py-2 text-gray-600 font-semibold">TOTAL</td>
+                                <td class="py-2 font-bold text-green-600">: Rp ${total.toLocaleString()}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            `;
             
             resultDiv.innerHTML = `
                 <div class="bg-white p-4 rounded-lg border-l-4" style="border-left-color: ${
@@ -1107,11 +1150,7 @@ function cekPesananRealtime() {
                         <p class="text-sm">${order.alamat}</p>
                     </div>
                     
-                    <div class="border-t pt-3">
-                        <p class="font-semibold">Detail Produk:</p>
-                        <p class="text-sm">${order.produkNama} x ${order.jumlah}</p>
-                        <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${(order.total || 0).toLocaleString()}</p>
-                    </div>
+                    ${detailPesanan}
                     
                     ${paymentInfo}
                     ${confirmInfo}
@@ -1119,7 +1158,7 @@ function cekPesananRealtime() {
                     ${reviewButton}
                     
                     <p class="text-xs text-gray-400 mt-3">
-                        <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
+                        <i class="far fa-clock mr-1"></i>Pesanan dibuat: ${new Date(order.waktu).toLocaleString('id-ID')}
                     </p>
                 </div>
             `;
@@ -1154,95 +1193,115 @@ function cekPesananRealtime() {
             document.getElementById('orderModal').style.display = 'none';
         }
 
-// ========== SUBMIT ORDER (FIX VERSION) ==========
-function submitOrder(event) {
-    event.preventDefault();
+// ========== SUBMIT REVIEW (FIX VERSION) ==========
+function submitReview() {
+    const orderId = document.getElementById('reviewOrderId').value;
+    const produkId = document.getElementById('reviewProductId').value;
+    const produkNama = document.getElementById('reviewProductName').value;
+    const rating = parseInt(document.getElementById('reviewRating').value);
+    const ulasan = document.getElementById('reviewText').value.trim();
+    const photoFile = document.getElementById('reviewPhoto').files[0];
     
-    const produkId = document.getElementById('orderProdukId').value;
-    const produkNama = document.getElementById('orderProdukNama').value;
-    const nama = document.getElementById('orderNama').value.trim();
-    const wa = document.getElementById('orderWA').value.trim();
-    const alamat = document.getElementById('orderAlamat').value.trim();
-    const qty = parseInt(document.getElementById('orderQty').value);
-    const harga = parseInt(document.getElementById('orderProdukHarga').value) || 0;
-    
-    if(!nama || !wa || !alamat) {
-        showToast('Semua field harus diisi!', 'error');
+    // Validasi
+    if(!orderId) {
+        showToast('ID pesanan tidak valid!', 'error');
         return;
     }
     
-    if(wa.replace(/[^0-9]/g, '').length < 10) {
-        showToast('Nomor WhatsApp tidak valid!', 'error');
+    if(!produkId) {
+        showToast('Data produk tidak valid!', 'error');
         return;
     }
     
-    // 🔴 INI BAGIAN YANG DIPERBAIKI - PAKE userSession, BUKAN session
-    cekSpam(userSession).then(isSpam => {
-        if(isSpam) {
-            showToast('Terlalu banyak pesanan! Tunggu 30 menit.', 'error');
+    if(!produkNama) {
+        showToast('Nama produk tidak valid!', 'error');
+        return;
+    }
+    
+    if(rating === 0) {
+        showToast('Pilih rating dulu!', 'error');
+        return;
+    }
+    
+    if(!ulasan) {
+        showToast('Tulis ulasan dulu!', 'error');
+        return;
+    }
+    
+    // Ambil data pesanan
+    db.ref('pesanan/' + orderId).once('value', (snap) => {
+        const order = snap.val();
+        
+        if(!order) {
+            showToast('Data pesanan tidak ditemukan!', 'error');
             return;
         }
         
-        const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        // 🔴 PASTIKAN STATUS SELESAI
+        if(order.status !== 'selesai') {
+            showToast('Ulasan hanya bisa diberikan untuk pesanan yang sudah selesai!', 'error');
+            return;
+        }
         
-        db.ref('pesanan').push({
-            kode: kodePesanan,
-            produkId: produkId,
-            produkNama: produkNama,
-            produkHarga: harga,
-            nama: nama,
-            wa: wa,
-            alamat: alamat,
-            jumlah: qty,
-            total: harga * qty,
-            status: 'menunggu-pembayaran',
+        // 🔴 CEK APAKAH SUDAH PERNAH ULASAN
+        if(order.dapatUlasan) {
+            showToast('Anda sudah memberikan ulasan untuk pesanan ini!', 'error');
+            return;
+        }
+        
+        // Siapkan data review
+        const reviewData = {
+            nama: order.nama || 'Anonymous',
+            produk: produkNama,
+            rating: rating,
+            ulasan: ulasan,
             waktu: Date.now(),
-            session: userSession,  // 🔴 INI JUGA HARUS DIGANTI
-            dapatUlasan: false,
-            riwayatStatus: [{
-                status: 'menunggu-pembayaran',
-                waktu: Date.now(),
-                catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran (batas 10 menit)'
-            }]
-        }).then(() => {
-            showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
-            tutupOrderModal();
-            updateTotalTerjual();
+            foto: null
+        };
+        
+        // Kalo ada foto, upload dulu
+        if(photoFile) {
+            showToast('📤 Mengupload foto...', 'success');
             
-            db.ref('pengaturan/rekening').once('value', (snap) => {
-                const rekening = snap.val() || { bank: 'BCA', nomor: '1234567890', nama: 'Jamu Herbal Alami' };
-                
-                const pesanWA = `🆕 *PESANAN BARU!*\n\n` +
-                    `*ID Pesanan:* ${kodePesanan}\n` +
-                    `*Nama:* ${nama}\n` +
-                    `*No. WA:* ${wa}\n` +
-                    `*Alamat:* ${alamat}\n\n` +
-                    `*Detail Pesanan:*\n` +
-                    `📦 Produk: ${produkNama}\n` +
-                    `🔢 Jumlah: ${qty} pcs\n` +
-                    `💰 Harga: Rp ${harga.toLocaleString()}\n` +
-                    `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
-                    `⏳ Status: MENUNGGU PEMBAYARAN\n` +
-                    `⏰ *Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi!*\n\n` +
-                    `🏦 *REKENING TUJUAN:*\n` +
-                    `Bank: ${rekening.bank}\n` +
-                    `No. Rek: ${rekening.nomor}\n` +
-                    `a.n. ${rekening.nama}\n\n` +
-                    `📱 *Cara Konfirmasi:*\n` +
-                    `1. Transfer sesuai total\n` +
-                    `2. Login ke panel admin\n` +
-                    `3. Masukkan ID pesanan ini di menu konfirmasi`;
-                
-                window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+            const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photoFile.name);
+            storageRef.put(photoFile).then(snapshot => {
+                return snapshot.ref.getDownloadURL();
+            }).then(downloadURL => {
+                reviewData.foto = downloadURL;
+                return simpanReview(reviewData, orderId, produkId);
+            }).catch(error => {
+                showToast('Gagal upload foto: ' + error.message, 'error');
             });
-            
-            document.getElementById('orderNama').value = '';
-            document.getElementById('orderWA').value = '';
-            document.getElementById('orderAlamat').value = '';
-        }).catch(error => {
-            showToast('Gagal memesan: ' + error.message, 'error');
-        });
+        } else {
+            // Langsung simpan tanpa foto
+            simpanReview(reviewData, orderId, produkId);
+        }
+        
+    }).catch(error => {
+        console.error('❌ Error:', error);
+        showToast('Gagal mengambil data pesanan: ' + error.message, 'error');
     });
+}
+
+// Fungsi bantu simpan review
+function simpanReview(reviewData, orderId, produkId) {
+    db.ref('testimoni').push(reviewData)
+        .then(() => {
+            // Tandai pesanan sudah dapat ulasan
+            return db.ref('pesanan/' + orderId).update({ dapatUlasan: true });
+        })
+        .then(() => {
+            // Update count ulasan di produk
+            return db.ref('produk/' + produkId + '/ulasanCount').transaction(current => (current || 0) + 1);
+        })
+        .then(() => {
+            showToast('✅ Terima kasih atas ulasannya!', 'success');
+            tutupReviewModal();
+            loadTestimoni(); // Refresh testimoni
+        })
+        .catch(error => {
+            showToast('Gagal menyimpan ulasan: ' + error.message, 'error');
+        });
 }
 
 // ========== KONFIRMASI DARI FLOATING DENGAN PIN (FIX) ==========
@@ -1495,43 +1554,37 @@ document.getElementById('konfirmasiInfo').innerHTML = `
         }
 
         // ========== MODAL REVIEW ==========
-        function bukaReviewModal(orderId, produkId, produkNama) {
-            document.getElementById('reviewOrderId').value = orderId;
-            document.getElementById('reviewProductId').value = produkId;
-            document.getElementById('reviewProductName').value = produkNama;
-            document.getElementById('reviewProductInfo').innerHTML = `
-                <p class="font-semibold">${produkNama}</p>
-                <p class="text-sm text-gray-600">Kasih rating & ulasan untuk produk ini</p>
-            `;
-            document.getElementById('reviewRating').value = 0;
-            document.getElementById('reviewText').value = '';
-            document.getElementById('reviewPhoto').value = '';
-            
-            document.querySelectorAll('#ratingStars i').forEach(star => {
-                star.className = 'fa-regular fa-star cursor-pointer hover:text-yellow-400';
-            });
-            
-            document.getElementById('reviewModal').style.display = 'flex';
-        }
+function bukaReviewModal(orderId, produkId, produkNama) {
+    document.getElementById('reviewOrderId').value = orderId;
+    document.getElementById('reviewProductId').value = produkId;
+    document.getElementById('reviewProductName').value = produkNama;
+    document.getElementById('reviewProductInfo').innerHTML = `
+        <p class="font-semibold">${produkNama}</p>
+        <p class="text-sm text-gray-600">Kasih rating & ulasan untuk produk ini</p>
+    `;
+    
+    // Reset rating
+    document.getElementById('reviewRating').value = 0;
+    document.getElementById('reviewText').value = '';
+    document.getElementById('reviewPhoto').value = '';
+    
+    // Reset slider dan bintang
+    const slider = document.getElementById('ratingSlider');
+    if(slider) {
+        slider.value = 0;
+        // Trigger update stars
+        const event = new Event('input');
+        slider.dispatchEvent(event);
+    }
+    
+    document.getElementById('reviewModal').style.display = 'flex';
+}
 
         function tutupReviewModal() {
             document.getElementById('reviewModal').style.display = 'none';
         }
 
-        document.querySelectorAll('#ratingStars i').forEach(star => {
-            star.addEventListener('click', function() {
-                const rating = parseInt(this.dataset.rating);
-                document.getElementById('reviewRating').value = rating;
-                
-                document.querySelectorAll('#ratingStars i').forEach((s, index) => {
-                    if(index < rating) {
-                        s.className = 'fa-solid fa-star text-yellow-400 cursor-pointer';
-                    } else {
-                        s.className = 'fa-regular fa-star cursor-pointer hover:text-yellow-400';
-                    }
-                });
-            });
-        });
+        
 
 // ========== GENERATE HTML FOTO ==========
 function generateFotoHTML(foto) {
@@ -2303,7 +2356,6 @@ function simpanProduk(event) {
         });
 
         // ========== INIT ==========
-// ========== INIT ==========
 window.onload = function() {
     console.log('🚀 Window loaded');
     
@@ -2341,6 +2393,9 @@ window.onload = function() {
     startRealtimeCountdown();
     startAdminPanelRefresh();
     checkFirebaseConnection();
+    
+    // 🔴 TAMBAHKAN INI
+    initRatingSlider();
     
     // Set default tanggal
     const today = new Date().toISOString().split('T')[0];
@@ -2570,16 +2625,25 @@ window.onload = function() {
             </div>
             <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg"></div>
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2 font-medium">Rating</label>
-                <div class="flex space-x-2 text-3xl" id="ratingStars">
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="1"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="2"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="3"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="4"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="5"></i>
-                </div>
-                <input type="hidden" id="reviewRating" value="0">
-            </div>
+    <label class="block text-gray-700 mb-2 font-medium">Rating <span class="text-yellow-500" id="ratingValueDisplay">(0/5)</span></label>
+    
+    <!-- Slider -->
+    <div class="rating-slider-container">
+        <input type="range" id="ratingSlider" class="rating-slider" min="0" max="5" step="1" value="0">
+    </div>
+    
+    <!-- Bintang display -->
+    <div class="rating-stars-display" id="ratingStarsDisplay">
+        <i class="fa-regular fa-star rating-star" data-star="1"></i>
+        <i class="fa-regular fa-star rating-star" data-star="2"></i>
+        <i class="fa-regular fa-star rating-star" data-star="3"></i>
+        <i class="fa-regular fa-star rating-star" data-star="4"></i>
+        <i class="fa-regular fa-star rating-star" data-star="5"></i>
+    </div>
+    
+    <!-- Hidden input untuk nilai rating -->
+    <input type="hidden" id="reviewRating" value="0">
+</div>
             <div class="mb-4">
                 <label class="block text-gray-700 mb-2 font-medium">Ulasan</label>
                 <textarea id="reviewText" rows="4" class="input-field" placeholder="Tulis pengalaman kamu..."></textarea>
@@ -3184,6 +3248,69 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// ========== RATING SLIDER FUNCTION ==========
+function initRatingSlider() {
+    const slider = document.getElementById('ratingSlider');
+    const ratingInput = document.getElementById('reviewRating');
+    const stars = document.querySelectorAll('.rating-star');
+    const ratingDisplay = document.getElementById('ratingValueDisplay');
+    
+    if(!slider) return;
+    
+    // Fungsi update bintang berdasarkan nilai slider
+    function updateStars(value) {
+        stars.forEach((star, index) => {
+            if(index < value) {
+                star.className = 'fa-solid fa-star rating-star active';
+            } else {
+                star.className = 'fa-regular fa-star rating-star';
+            }
+        });
+        
+        // Update background slider
+        const percentage = (value / 5) * 100;
+        slider.style.background = `linear-gradient(90deg, #fbbf24 0%, #fbbf24 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+        
+        // Update display text
+        if(ratingDisplay) {
+            ratingDisplay.textContent = value > 0 ? `(${value}/5)` : '(0/5)';
+        }
+    }
+    
+    // Event listener slider
+    slider.addEventListener('input', function() {
+        const value = parseInt(this.value);
+        ratingInput.value = value;
+        updateStars(value);
+    });
+    
+    // Klik bintang juga bisa (opsional)
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = parseInt(this.dataset.star);
+            slider.value = value;
+            ratingInput.value = value;
+            updateStars(value);
+        });
+    });
+    
+    // Reset ke 0 saat modal dibuka
+    const modal = document.getElementById('reviewModal');
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if(mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                if(modal.style.display === 'flex') {
+                    slider.value = 0;
+                    ratingInput.value = 0;
+                    updateStars(0);
+                }
+            }
+        });
+    });
+    
+    observer.observe(modal, { attributes: true });
+}
 
     </script>
 
