@@ -138,6 +138,18 @@
         }
         .btn-primary:hover { background: #047857; transform: translateY(-1px); }
         
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-danger:hover { background: #b91c1c; transform: translateY(-1px); }
+        
         .btn-success {
             background: #10b981;
             color: white;
@@ -210,6 +222,143 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        .total-terjual-badge {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .total-terjual-badge:hover {
+            transform: scale(1.05);
+            background-color: #fbbf24 !important;
+        }
+        
+.deskripsi-produk {
+    white-space: pre-line;
+}
+
+/* Modal foto fullscreen */
+.foto-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.foto-modal.show {
+    display: flex;
+}
+
+.foto-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.foto-modal .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+.foto-thumbnail {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.foto-thumbnail:hover {
+    opacity: 0.8;
+}
+
+.foto-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.foto-modal.show {
+    display: flex;
+}
+
+.foto-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.foto-modal .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+    transition: 0.3s;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+}
+
+.foto-modal .close:hover {
+    background: rgba(255,255,255,0.4);
+    transform: scale(1.1);
+}
+
+.foto-thumbnail {
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 8px;
+}
+
+.foto-thumbnail:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+/* Grid foto produk */
+.foto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.foto-grid-item {
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+}
+
+.foto-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
     </style>
 </head>
 <body>
@@ -251,64 +400,10 @@
         const EXPIRY_TIME = 10 * 60 * 1000; // 10 menit
         const SPAM_LIMIT = 3;
         const SPAM_WINDOW = 30 * 60 * 1000; // 30 menit
-        const ADMIN_PASSWORD = "jamu123";
+        const ADMIN_PASSWORD = "Bundajaya13791";
+        const KONFIRMASI_PIN = "123456"; // PIN 6 digit, ganti sesuai keinginan
 
-        // Sample products
-        const sampleProducts = [
-            {
-                nama: "Jahe Merah Original",
-                deskripsi: "Jahe merah pilihan, cocok untuk menghangatkan tubuh, meredakan masuk angin, dan meningkatkan imunitas.",
-                harga: 35000,
-                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123456.jpg",
-                terjual: 45,
-                ulasanCount: 12
-            },
-            {
-                nama: "Kunyit Asam",
-                deskripsi: "Kunyit asam tradisional, baik untuk kesehatan wanita, melancarkan haid, dan sebagai antioksidan.",
-                harga: 25000,
-                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123457.jpg",
-                terjual: 67,
-                ulasanCount: 23
-            },
-            {
-                nama: "Beras Kencur",
-                deskripsi: "Beras kencur asli, resep turun temurun. Menghangatkan tubuh, meredakan pegal-pegal, dan menambah nafsu makan.",
-                harga: null,
-                foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123458.jpg",
-                terjual: 28,
-                ulasanCount: 8
-            }
-        ];
-
-        // Sample testimonials
-        const sampleTestimonials = [
-            {
-                nama: "Siti Nurhaliza",
-                rating: 5,
-                ulasan: "Jahe merahnya mantap! Badan langsung hangat dan enak banget rasanya. Recommended banget!",
-                produk: "Jahe Merah Original",
-                waktu: Date.now() - 86400000,
-                foto: "https://ui-avatars.com/api/?name=Siti+Nurhaliza"
-            },
-            {
-                nama: "Budi Santoso",
-                rating: 4,
-                ulasan: "Kunyit asamnya segar, cocok diminum siang hari. Pengiriman cepat, packing rapi.",
-                produk: "Kunyit Asam",
-                waktu: Date.now() - 172800000,
-                foto: "https://ui-avatars.com/api/?name=Budi+Santoso"
-            },
-            {
-                nama: "Dewi Lestari",
-                rating: 5,
-                ulasan: "Beras kencurnya enak, anak saya jadi lahap makan. Makasih seller 🌿",
-                produk: "Beras Kencur",
-                waktu: Date.now() - 259200000,
-                foto: "https://ui-avatars.com/api/?name=Dewi+Lestari"
-            }
-        ];
-
+        
         // ========== UTILITY ==========
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -343,6 +438,85 @@
                 clickCount = 0;
                 showToast('🔓 Admin panel tersedia!', 'success');
             }
+        }
+
+        // ========== UPDATE TOTAL TERJUAL REALTIME ==========
+               function updateTotalTerjual() {
+    if(!db) {
+        const badge = document.getElementById('totalTerjual');
+        if(badge) {
+            badge.innerHTML = `<i class="fas fa-chart-line mr-1"></i>0 Terjual`;
+        }
+        return;
+    }
+    
+    db.ref('pesanan').once('value', (snapshot) => {
+        const data = snapshot.val();
+        let total = 0;
+        
+        if(data) {
+            Object.keys(data).forEach(key => {
+                if(data[key] && data[key].status === 'selesai') {
+                    total += data[key].jumlah || 0;
+                }
+            });
+        }
+        // Kalo ga ada data, total tetap 0
+        
+        const badge = document.getElementById('totalTerjual');
+        if(badge) {
+            badge.innerHTML = `<i class="fas fa-chart-line mr-1"></i>${total} Terjual`;
+        }
+    }).catch(error => {
+        console.error('❌ Error update total:', error);
+    });
+}
+
+        // ========== AUTO REFRESH TOTAL TERJUAL ==========
+        setInterval(updateTotalTerjual, 3000);
+
+        // ========== HAPUS SEMUA DATA ==========
+        function hapusSemuaData() {
+            if(!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data:\n- Semua pesanan\n- Semua produk\n- Semua testimoni\n- Semua pengaturan\n\nWeb akan kembali ke kondisi awal (pakai sample data).\n\nYakin mau lanjut?')) {
+                return;
+            }
+            
+            if(!confirm('KONFIRMASI TERAKHIR! Data akan hilang permanen. Lanjutkan?')) {
+                return;
+            }
+            
+            showToast('🧹 Menghapus semua data...', 'success');
+            
+            // Hapus semua node di database
+            const hapusProduk = db.ref('produk').remove();
+            const hapusPesanan = db.ref('pesanan').remove();
+            const hapusTestimoni = db.ref('testimoni').remove();
+            const hapusPengaturan = db.ref('pengaturan').remove();
+            
+            Promise.all([hapusProduk, hapusPesanan, hapusTestimoni, hapusPengaturan])
+                .then(() => {
+                    // Bersihin localStorage
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    
+                    // Bersihin cache
+                    if('caches' in window) {
+                        caches.keys().then(names => {
+                            names.forEach(name => {
+                                caches.delete(name);
+                            });
+                        });
+                    }
+                    
+                    showToast('✅ Semua data terhapus! Refresh halaman...', 'success');
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                })
+                .catch(error => {
+                    showToast('❌ Gagal hapus data: ' + error.message, 'error');
+                });
         }
 
         // ========== CEK KONEKSI FIREBASE ==========
@@ -523,7 +697,7 @@
                 if(adminPanel && adminPanel.style.display === 'flex') {
                     loadAdminData();
                 }
-            }, 5000);
+            }, 3000);
         }
 
         // ========== FUNGSI CHAT WA ==========
@@ -546,189 +720,243 @@
             }
         }
 
-        // ========== LOAD PRODUK ==========
-        function loadProduk() {
-            const container = document.getElementById('produkList');
-            container.innerHTML = '<div class="text-center col-span-3 py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Memuat produk...</p></div>';
-            
-            db.ref('produk').once('value', (snapshot) => {
-                let data = snapshot.val();
-                
-                if(!data) {
-                    let html = '';
-                    let totalTerjual = 0;
-                    
-                    sampleProducts.forEach((p, index) => {
-                        totalTerjual += p.terjual || 0;
-                        
-                        const punyaHarga = p.harga && !isNaN(p.harga);
-                        let hargaTampil = 'Hubungi WA';
-                        let tombol = '';
-                        
-                        if(punyaHarga) {
-                            hargaTampil = 'Rp ' + Number(p.harga).toLocaleString();
-                            tombol = `<button onclick="beliProduk('sample-${index}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga})" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
-                                <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
-                            </button>`;
-                        } else {
-                            tombol = `<button onclick="chatWA('${p.nama.replace(/'/g, "\\'")}', null)" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                                <i class="fab fa-whatsapp mr-1"></i>Chat WA
-                            </button>`;
-                        }
-                        
-                        html += `
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
-                                <img src="${p.foto || 'https://via.placeholder.com/300x200?text=Jamu+Herbal'}" class="w-full h-56 object-cover" onerror="this.src='https://via.placeholder.com/300x200?text=Jamu+Herbal'">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
-                                    <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
-                                    <div class="flex items-center mb-3">
-                                        <div class="flex text-yellow-400 mr-2">
-                                            ${Array(5).fill(0).map((_, i) => 
-                                                `<i class="fa-${i < (p.ulasanCount || 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`
-                                            ).join('')}
-                                        </div>
-                                        <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
-                                    </div>
-                                    <div class="flex justify-between items-center mb-4">
-                                        <span class="text-2xl font-bold text-green-600">${hargaTampil}</span>
-                                        <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                            <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
-                                        </span>
-                                    </div>
-                                    ${tombol}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = html;
-                    document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
-                    return;
-                }
-                
-                let html = '';
-                let totalTerjual = 0;
-
-                Object.keys(data).forEach(key => {
-                    const p = data[key];
-                    totalTerjual += p.terjual || 0;
-
-                    const punyaHarga = p.harga && !isNaN(p.harga);
-                    let hargaTampil = 'Hubungi WA';
-                    let tombol = '';
-                    
-                    if(punyaHarga) {
-                        hargaTampil = 'Rp ' + Number(p.harga).toLocaleString();
-                        tombol = `<button onclick="beliProduk('${key}', '${p.nama.replace(/'/g, "\\'")}', ${p.harga})" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
-                            <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
-                        </button>`;
-                    } else {
-                        tombol = `<button onclick="chatWA('${p.nama.replace(/'/g, "\\'")}', null)" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                            <i class="fab fa-whatsapp mr-1"></i>Chat WA
-                        </button>`;
-                    }
-
-                    html += `
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card">
-                            <img src="${p.foto || 'https://via.placeholder.com/300x200?text=Jamu+Herbal'}" class="w-full h-56 object-cover" onerror="this.src='https://via.placeholder.com/300x200?text=Jamu+Herbal'">
-                            <div class="p-5">
-                                <h3 class="font-bold text-xl mb-2">${p.nama}</h3>
-                                <p class="text-gray-600 mb-3 text-sm">${p.deskripsi}</p>
-                                <div class="flex items-center mb-3">
-                                    <div class="flex text-yellow-400 mr-2">
-                                        ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < (p.ulasanCount || 0) ? 'solid' : 'regular'} fa-star text-sm"></i>`
-                                        ).join('')}
-                                    </div>
-                                    <span class="text-sm text-gray-500">(${p.ulasanCount || 0} ulasan)</span>
-                                </div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-2xl font-bold text-green-600">${hargaTampil}</span>
-                                    <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                        <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
-                                    </span>
-                                </div>
-                                ${tombol}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = html;
-                document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
-                
-            }, (error) => {
-                console.error('❌ Error loading produk:', error);
-                container.innerHTML = '<div class="text-center col-span-3 py-8 text-red-600">Gagal memuat produk. Cek koneksi Firebase.</div>';
-            });
+// ========== FUNGSI GENERATE HTML FOTO ==========
+function generateFotoHTML(foto) {
+    if(!foto) return '';
+    
+    let fotoUrls = [];
+    
+    // Kalo foto berupa string, cek apakah multiple (dipisah koma)
+    if(typeof foto === 'string') {
+        if(foto.includes(',')) {
+            fotoUrls = foto.split(',').map(url => url.trim()).filter(url => url);
+        } else {
+            fotoUrls = [foto];
         }
+    } 
+    // Kalo foto sudah berupa array
+    else if(Array.isArray(foto)) {
+        fotoUrls = foto;
+    }
+    
+    if(fotoUrls.length === 0) return '';
+    
+    // Kalo cuma 1 foto, tampilkan besar
+    if(fotoUrls.length === 1) {
+        return `
+            <div class="mb-4">
+                <img src="${fotoUrls[0]}" 
+                     class="w-full h-56 object-cover rounded-lg foto-thumbnail" 
+                     onclick="bukaFotoModal('${fotoUrls[0]}')" 
+                     onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Tidak+Tersedia'">
+            </div>
+        `;
+    }
+    
+    // Kalo lebih dari 1, tampilkan grid
+    let gridHtml = '<div class="grid grid-cols-3 gap-2 mb-4">';
+    fotoUrls.forEach((url, index) => {
+        gridHtml += `
+            <div class="aspect-square overflow-hidden rounded-lg border border-gray-200">
+                <img src="${url}" 
+                     class="w-full h-full object-cover foto-thumbnail" 
+                     onclick="bukaFotoModal('${url}')" 
+                     onerror="this.src='https://via.placeholder.com/100?text=Error'">
+            </div>
+        `;
+    });
+    gridHtml += '</div>';
+    
+    return gridHtml;
+}
+
+// ========== LOAD PRODUK (DENGAN FALLBACK SAMPLE) ==========
+function loadProduk() {
+    const container = document.getElementById('produkList');
+    
+    if(!container) return;
+    
+    container.innerHTML = '<div class="text-center col-span-3 py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Memuat produk...</p></div>';
+    
+    // Timeout 3 detik
+    const timeout = setTimeout(() => {
+        console.log('⏰ Firebase timeout, pakai sample data');
+        tampilkanSampleProduk();
+    }, 3000);
+    
+    if(!db) {
+        clearTimeout(timeout);
+        tampilkanSampleProduk();
+        return;
+    }
+    
+    db.ref('produk').once('value', (snapshot) => {
+        clearTimeout(timeout);
+        
+        const data = snapshot.val();
+        
+        if(!data) {
+            tampilkanSampleProduk();
+            return;
+        }
+        
+        // Tampilkan produk dari Firebase
+        let html = '';
+        let totalTerjual = 0;
+        
+        Object.keys(data).forEach(key => {
+            const p = data[key];
+            totalTerjual += p.terjual || 0;
+            
+            // ... kode nampilin produk dari Firebase ...
+        });
+        
+        container.innerHTML = html;
+        document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
+        
+    }).catch(error => {
+        clearTimeout(timeout);
+        console.error('Error:', error);
+        tampilkanSampleProduk();
+    });
+}
+
+// Fungsi terpisah buat sample produk
+function tampilkanSampleProduk() {
+    const container = document.getElementById('produkList');
+    
+    const sampleProducts = [
+        {
+            nama: "JAHE MERAH ORIGINAL",
+            deskripsi: "Jahe merah pilihan, cocok untuk menghangatkan tubuh, meredakan masuk angin, dan meningkatkan imunitas.\n\nRacikan herbal ini juga dikenal dapat membantu meningkatkan stamina, menambah energi, serta mendukung vitalitas tubuh bagi pria maupun wanita.",
+            harga: 35000,
+            foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123456.jpg",
+            terjual: 45,
+            ulasanCount: 12
+        },
+        {
+            nama: "KUNYIT ASAM",
+            deskripsi: "Kunyit asam tradisional, baik untuk kesehatan wanita, melancarkan haid, dan sebagai antioksidan.\n\nSelain itu, racikan herbal ini juga dikenal dapat membantu meningkatkan stamina, menambah energi, serta mendukung vitalitas tubuh.",
+            harga: 25000,
+            foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123457.jpg",
+            terjual: 67,
+            ulasanCount: 23
+        },
+        {
+            nama: "BERAS KENCUR",
+            deskripsi: "Beras kencur asli, resep turun temurun. Menghangatkan tubuh, meredakan pegal-pegal, dan menambah nafsu makan.\n\nHerbal ini juga sering digunakan oleh pasangan suami istri yang sedang menjalani program kehamilan.",
+            harga: null,
+            foto: "https://images.tokopedia.net/img/cache/500-square/product-1/2020/1/1/123456/123456_123458.jpg",
+            terjual: 28,
+            ulasanCount: 8
+        }
+    ];
+    
+    let html = '';
+    let totalTerjual = 0;
+    
+    sampleProducts.forEach(p => {
+        totalTerjual += p.terjual || 0;
+        
+        const punyaHarga = p.harga && !isNaN(p.harga) && p.harga > 0;
+        let hargaTampil = 'Hubungi WA';
+        let tombol = '';
+        
+        if(punyaHarga) {
+            hargaTampil = 'Rp ' + Number(p.harga).toLocaleString('id-ID');
+            tombol = `<button onclick="alert('Sample mode: Order via WA')" class="w-full bg-green-600 text-white py-3 rounded-lg">Beli</button>`;
+        } else {
+            tombol = `<button onclick="alert('Chat WA')" class="w-full bg-blue-600 text-white py-3 rounded-lg">Chat</button>`;
+        }
+        
+        html += `<div class="bg-white rounded-xl shadow-lg p-5">...</div>`; // HTML lengkap
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
+    
+    showToast('⚠️ Mode sample: Firebase tidak tersedia', 'success');
+}
 
         // ========== LOAD TESTIMONI ==========
-        function loadTestimoni() {
-            const container = document.getElementById('testimoniList');
-            
-            db.ref('testimoni').orderByChild('waktu').limitToLast(6).once('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                if(!data) {
-                    let html = '';
-                    sampleTestimonials.forEach(t => {
-                        html += `
-                            <div class="bg-white rounded-xl shadow-md p-5">
-                                <div class="flex items-center mb-3">
-                                    <img src="${t.foto}" class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-green-200">
-                                    <div>
-                                        <p class="font-semibold">${t.nama}</p>
-                                        <div class="flex text-yellow-400">
-                                            ${Array(5).fill(0).map((_, i) => 
-                                                `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
-                                            ).join('')}
-                                        </div>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
-                                <p class="text-xs text-gray-400">
-                                    <i class="fas fa-tag mr-1"></i>${t.produk}
-                                </p>
-                            </div>
-                        `;
-                    });
-                    container.innerHTML = html;
-                    return;
-                }
-
-                const testimonials = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse().slice(0, 6);
-
-                let html = '';
-                testimonials.forEach(t => {
-                    html += `
-                        <div class="bg-white rounded-xl shadow-md p-5">
-                            <div class="flex items-center mb-3">
-                                <img src="${t.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.nama)}" 
-                                     class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-green-200">
-                                <div>
-                                    <p class="font-semibold">${t.nama}</p>
-                                    <div class="flex text-yellow-400">
-                                        ${Array(5).fill(0).map((_, i) => 
-                                            `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
-                                        ).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
-                            <p class="text-xs text-gray-400">
-                                <i class="fas fa-tag mr-1"></i>${t.produk || 'Jamu Herbal'}
-                            </p>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            }, (error) => {
-                console.error('❌ Error loading testimoni:', error);
-                container.innerHTML = '<p class="text-center col-span-3 text-gray-500 py-8">Gagal memuat testimoni</p>';
-            });
+function loadTestimoni() {
+    const container = document.getElementById('testimoniList');
+    container.innerHTML = '<div class="text-center col-span-3 py-8"><div class="loading-spinner mx-auto"></div><p class="mt-4 text-gray-600">Memuat testimoni...</p></div>';
+    
+    // Timeout 5 detik
+    const timeout = setTimeout(() => {
+        container.innerHTML = `
+            <div class="text-center col-span-3 py-12">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                <p class="text-red-600 font-bold">⏰ Timeout! Firebase tidak merespon.</p>
+                <button onclick="location.reload()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh Halaman
+                </button>
+            </div>
+        `;
+    }, 5000);
+    
+    if(!db) {
+        clearTimeout(timeout);
+        container.innerHTML = '<div class="text-center col-span-3 py-8 text-red-600">Database tidak tersedia</div>';
+        return;
+    }
+    
+    db.ref('testimoni').orderByChild('waktu').limitToLast(6).once('value', (snapshot) => {
+        clearTimeout(timeout);
+        
+        const data = snapshot.val();
+        
+        if(!data) {
+            container.innerHTML = `
+                <div class="text-center col-span-3 py-12">
+                    <div class="text-6xl mb-4 opacity-30">⭐</div>
+                    <p class="text-gray-500 text-lg">Belum ada testimoni</p>
+                    <p class="text-gray-400 text-sm mt-2">Jadilah yang pertama memberikan ulasan!</p>
+                </div>
+            `;
+            return;
         }
+
+        const testimonials = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse().slice(0, 6);
+
+        let html = '';
+        testimonials.forEach(t => {
+            html += `
+                <div class="bg-white rounded-xl shadow-md p-5">
+                    <div class="flex items-center mb-3">
+                        <img src="${t.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.nama)}" 
+                             class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-green-200">
+                        <div>
+                            <p class="font-semibold">${t.nama}</p>
+                            <div class="flex text-yellow-400">
+                                ${Array(5).fill(0).map((_, i) => 
+                                    `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-tag mr-1"></i>${t.produk || 'Jamu Herbal'}
+                    </p>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        
+    }).catch(error => {
+        clearTimeout(timeout);
+        console.error('❌ Error loading testimoni:', error);
+        container.innerHTML = `
+            <div class="text-center col-span-3 py-8 text-red-600">
+                <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                <p>Gagal memuat testimoni: ${error.message}</p>
+                <button onclick="loadTestimoni()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg">Coba Lagi</button>
+            </div>
+        `;
+    });
+}
 
         // ========== CEK PESANAN REALTIME ==========
         function cekPesananRealtime() {
@@ -808,7 +1036,7 @@
                                 <p class="text-sm">Transfer ke rekening:</p>
                                 <p class="font-mono font-bold">BCA 1234567890</p>
                                 <p class="text-sm">a.n. Jamu Herbal Alami</p>
-                                <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
+                                <p class="text-sm mt-2">Total: <span class="font-bold">Rp ${(order.total || 0).toLocaleString()}}</span></p>
                                 <p class="text-xs text-red-600 mt-2">*Pesanan akan hangus dalam 10 menit jika tidak dibayar</p>
                             </div>
                         `;
@@ -882,7 +1110,7 @@
                             <div class="border-t pt-3">
                                 <p class="font-semibold">Detail Produk:</p>
                                 <p class="text-sm">${order.produkNama} x ${order.jumlah}</p>
-                                <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${order.total.toLocaleString()}</p>
+                                <p class="text-sm font-bold text-green-600 mt-1">Total: Rp ${(konfirmasiData.jumlah || 0).toLocaleString()}</p>
                             </div>
                             
                             ${paymentInfo}
@@ -926,176 +1154,198 @@
             document.getElementById('orderModal').style.display = 'none';
         }
 
-        // ========== SUBMIT ORDER ==========
-        function submitOrder(event) {
-            event.preventDefault();
-            
-            const produkId = document.getElementById('orderProdukId').value;
-            const produkNama = document.getElementById('orderProdukNama').value;
-            const nama = document.getElementById('orderNama').value.trim();
-            const wa = document.getElementById('orderWA').value.trim();
-            const alamat = document.getElementById('orderAlamat').value.trim();
-            const qty = parseInt(document.getElementById('orderQty').value);
-            const harga = parseInt(document.getElementById('orderProdukHarga').value);
-            const session = document.getElementById('orderSession').value;
-            
-            if(!nama || !wa || !alamat) {
-                showToast('Semua field harus diisi!', 'error');
-                return;
-            }
-            
-            if(wa.replace(/[^0-9]/g, '').length < 10) {
-                showToast('Nomor WhatsApp tidak valid!', 'error');
-                return;
-            }
-            
-            cekSpam(session).then(isSpam => {
-                if(isSpam) {
-                    showToast('Terlalu banyak pesanan! Tunggu 30 menit.', 'error');
-                    return;
-                }
-                
-                const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-                
-                db.ref('pesanan').push({
-                    kode: kodePesanan,
-                    produkId: produkId,
-                    produkNama: produkNama,
-                    produkHarga: harga,
-                    nama: nama,
-                    wa: wa,
-                    alamat: alamat,
-                    jumlah: qty,
-                    total: harga * qty,
-                    status: 'menunggu-pembayaran',
-                    waktu: Date.now(),
-                    session: session,
-                    dapatUlasan: false,
-                    riwayatStatus: [{
-                        status: 'menunggu-pembayaran',
-                        waktu: Date.now(),
-                        catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran (batas 10 menit)'
-                    }]
-                }).then(() => {
-                    showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
-                    tutupOrderModal();
-                    
-                    db.ref('pengaturan/rekening').once('value', (snap) => {
-                        const rekening = snap.val() || { bank: 'BCA', nomor: '1234567890', nama: 'Jamu Herbal Alami' };
-                        
-                        const pesanWA = `🆕 *PESANAN BARU!*\n\n` +
-                            `*ID Pesanan:* ${kodePesanan}\n` +
-                            `*Nama:* ${nama}\n` +
-                            `*No. WA:* ${wa}\n` +
-                            `*Alamat:* ${alamat}\n\n` +
-                            `*Detail Pesanan:*\n` +
-                            `📦 Produk: ${produkNama}\n` +
-                            `🔢 Jumlah: ${qty} pcs\n` +
-                            `💰 Harga: Rp ${harga.toLocaleString()}\n` +
-                            `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
-                            `⏳ Status: MENUNGGU PEMBAYARAN\n` +
-                            `⏰ *Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi!*\n\n` +
-                            `🏦 *REKENING TUJUAN:*\n` +
-                            `Bank: ${rekening.bank}\n` +
-                            `No. Rek: ${rekening.nomor}\n` +
-                            `a.n. ${rekening.nama}\n\n` +
-                            `📱 *Cara Konfirmasi:*\n` +
-                            `1. Transfer sesuai total\n` +
-                            `2. Login ke panel admin\n` +
-                            `3. Masukkan ID pesanan ini di menu konfirmasi`;
-                        
-                        window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-                    });
-                    
-                    document.getElementById('orderNama').value = '';
-                    document.getElementById('orderWA').value = '';
-                    document.getElementById('orderAlamat').value = '';
-                }).catch(error => {
-                    showToast('Gagal memesan: ' + error.message, 'error');
-                });
-            });
+// ========== SUBMIT ORDER (FIX VERSION) ==========
+function submitOrder(event) {
+    event.preventDefault();
+    
+    const produkId = document.getElementById('orderProdukId').value;
+    const produkNama = document.getElementById('orderProdukNama').value;
+    const nama = document.getElementById('orderNama').value.trim();
+    const wa = document.getElementById('orderWA').value.trim();
+    const alamat = document.getElementById('orderAlamat').value.trim();
+    const qty = parseInt(document.getElementById('orderQty').value);
+    const harga = parseInt(document.getElementById('orderProdukHarga').value) || 0;
+    
+    if(!nama || !wa || !alamat) {
+        showToast('Semua field harus diisi!', 'error');
+        return;
+    }
+    
+    if(wa.replace(/[^0-9]/g, '').length < 10) {
+        showToast('Nomor WhatsApp tidak valid!', 'error');
+        return;
+    }
+    
+    // 🔴 INI BAGIAN YANG DIPERBAIKI - PAKE userSession, BUKAN session
+    cekSpam(userSession).then(isSpam => {
+        if(isSpam) {
+            showToast('Terlalu banyak pesanan! Tunggu 30 menit.', 'error');
+            return;
         }
-
-        document.getElementById('orderQty')?.addEventListener('input', function() {
-            const harga = parseInt(document.getElementById('orderProdukHarga').value);
-            const qty = parseInt(this.value) || 1;
-            document.getElementById('orderTotal').textContent = `Rp ${(harga * qty).toLocaleString()}`;
+        
+        const kodePesanan = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        
+        db.ref('pesanan').push({
+            kode: kodePesanan,
+            produkId: produkId,
+            produkNama: produkNama,
+            produkHarga: harga,
+            nama: nama,
+            wa: wa,
+            alamat: alamat,
+            jumlah: qty,
+            total: harga * qty,
+            status: 'menunggu-pembayaran',
+            waktu: Date.now(),
+            session: userSession,  // 🔴 INI JUGA HARUS DIGANTI
+            dapatUlasan: false,
+            riwayatStatus: [{
+                status: 'menunggu-pembayaran',
+                waktu: Date.now(),
+                catatan: 'Pesanan dibuat, menunggu konfirmasi pembayaran (batas 10 menit)'
+            }]
+        }).then(() => {
+            showToast(`✅ Pesanan berhasil! ID: ${kodePesanan}`, 'success');
+            tutupOrderModal();
+            updateTotalTerjual();
+            
+            db.ref('pengaturan/rekening').once('value', (snap) => {
+                const rekening = snap.val() || { bank: 'BCA', nomor: '1234567890', nama: 'Jamu Herbal Alami' };
+                
+                const pesanWA = `🆕 *PESANAN BARU!*\n\n` +
+                    `*ID Pesanan:* ${kodePesanan}\n` +
+                    `*Nama:* ${nama}\n` +
+                    `*No. WA:* ${wa}\n` +
+                    `*Alamat:* ${alamat}\n\n` +
+                    `*Detail Pesanan:*\n` +
+                    `📦 Produk: ${produkNama}\n` +
+                    `🔢 Jumlah: ${qty} pcs\n` +
+                    `💰 Harga: Rp ${harga.toLocaleString()}\n` +
+                    `💵 Total: Rp ${(harga * qty).toLocaleString()}\n\n` +
+                    `⏳ Status: MENUNGGU PEMBAYARAN\n` +
+                    `⏰ *Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi!*\n\n` +
+                    `🏦 *REKENING TUJUAN:*\n` +
+                    `Bank: ${rekening.bank}\n` +
+                    `No. Rek: ${rekening.nomor}\n` +
+                    `a.n. ${rekening.nama}\n\n` +
+                    `📱 *Cara Konfirmasi:*\n` +
+                    `1. Transfer sesuai total\n` +
+                    `2. Login ke panel admin\n` +
+                    `3. Masukkan ID pesanan ini di menu konfirmasi`;
+                
+                window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+            });
+            
+            document.getElementById('orderNama').value = '';
+            document.getElementById('orderWA').value = '';
+            document.getElementById('orderAlamat').value = '';
+        }).catch(error => {
+            showToast('Gagal memesan: ' + error.message, 'error');
         });
+    });
+}
 
-        // ========== KONFIRMASI DARI FLOATING ==========
-        function konfirmasiDariFloating() {
-            const idPesanan = document.getElementById('floatingConfirmId').value.trim();
-            const resultDiv = document.getElementById('floatingConfirmResult');
-            
-            if(!idPesanan) {
-                resultDiv.innerHTML = '<p class="text-red-600">❌ Masukkan ID pesanan!</p>';
-                resultDiv.classList.remove('hidden');
-                return;
-            }
-            
-            db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                if(!data) {
-                    resultDiv.innerHTML = '<p class="text-red-600">❌ ID Pesanan tidak ditemukan!</p>';
-                    resultDiv.classList.remove('hidden');
-                    return;
-                }
-                
-                const orderId = Object.keys(data)[0];
-                const order = data[orderId];
-                
-                if(order.status !== 'menunggu-pembayaran') {
-                    resultDiv.innerHTML = `<p class="text-red-600">❌ Status bukan "Menunggu Pembayaran" (${order.status})</p>`;
-                    resultDiv.classList.remove('hidden');
-                    return;
-                }
-                
-                const waktuOrder = order.waktu || 0;
-                const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
-                
-                if(Date.now() > waktuKadaluarsa) {
-                    resultDiv.innerHTML = `<p class="text-red-600">❌ Pesanan sudah kadaluarsa (lebih dari 10 menit)</p>`;
-                    resultDiv.classList.remove('hidden');
-                    return;
-                }
-                
-                const riwayatBaru = order.riwayatStatus || [];
-                riwayatBaru.push({
-                    status: 'proses',
-                    waktu: Date.now(),
-                    catatan: 'Pembayaran dikonfirmasi via FLOATING CONFIRM'
-                });
-                
-                db.ref('pesanan/' + orderId).update({
-                    status: 'proses',
-                    riwayatStatus: riwayatBaru,
-                    konfirmasiPembayaran: {
-                        metode: 'Floating Confirm',
-                        waktuKonfirmasi: Date.now(),
-                        dikonfirmasiOleh: 'Admin'
-                    }
-                }).then(() => {
-                    resultDiv.innerHTML = '<p class="text-green-600 font-bold">✅ BERHASIL! Status: DIPROSES</p>';
-                    resultDiv.classList.remove('hidden');
-                    
-                    const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
-                        `Halo ${order.nama},\n` +
-                        `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
-                        `📦 *Status Terbaru:* DIPROSES\n` +
-                        `Kami akan segera memproses pesanan Anda.\n\n` +
-                        `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
-                    
-                    window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-                    
-                    document.getElementById('floatingConfirmId').value = '';
-                    
-                    setTimeout(() => {
-                        resultDiv.classList.add('hidden');
-                    }, 3000);
-                });
-            });
+// ========== KONFIRMASI DARI FLOATING DENGAN PIN (FIX) ==========
+function konfirmasiDariFloating() {
+    const inputPin = document.getElementById('floatingConfirmPin').value.trim();
+    const idPesanan = document.getElementById('floatingConfirmId').value.trim();
+    const resultDiv = document.getElementById('floatingConfirmResult');
+    
+    // Reset result
+    resultDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
+    
+    // Validasi PIN
+    if(!inputPin) {
+        resultDiv.innerHTML = '<p class="text-red-600">❌ Masukkan PIN konfirmasi!</p>';
+        resultDiv.classList.remove('hidden');
+        return;
+    }
+    
+    if(inputPin !== KONFIRMASI_PIN) {
+        resultDiv.innerHTML = '<p class="text-red-600">❌ PIN salah!</p>';
+        resultDiv.classList.remove('hidden');
+        return;
+    }
+    
+    if(!idPesanan) {
+        resultDiv.innerHTML = '<p class="text-red-600">❌ Masukkan ID pesanan!</p>';
+        resultDiv.classList.remove('hidden');
+        return;
+    }
+    
+    // Cari pesanan
+    db.ref('pesanan').orderByChild('kode').equalTo(idPesanan).once('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if(!data) {
+            resultDiv.innerHTML = '<p class="text-red-600">❌ ID Pesanan tidak ditemukan!</p>';
+            resultDiv.classList.remove('hidden');
+            return;
         }
+        
+        const orderId = Object.keys(data)[0];
+        const order = data[orderId];
+        
+        if(order.status !== 'menunggu-pembayaran') {
+            resultDiv.innerHTML = `<p class="text-red-600">❌ Status bukan "Menunggu Pembayaran" (${order.status})</p>`;
+            resultDiv.classList.remove('hidden');
+            return;
+        }
+        
+        // Cek expired
+        const waktuOrder = order.waktu || 0;
+        const waktuKadaluarsa = waktuOrder + EXPIRY_TIME;
+        
+        if(Date.now() > waktuKadaluarsa) {
+            resultDiv.innerHTML = `<p class="text-red-600">❌ Pesanan sudah kadaluarsa (lebih dari 10 menit)</p>`;
+            resultDiv.classList.remove('hidden');
+            return;
+        }
+        
+        // Update status
+        const riwayatBaru = order.riwayatStatus || [];
+        riwayatBaru.push({
+            status: 'proses',
+            waktu: Date.now(),
+            catatan: `Pembayaran dikonfirmasi via FLOATING CONFIRM (PIN: ${inputPin})`
+        });
+        
+        db.ref('pesanan/' + orderId).update({
+            status: 'proses',
+            riwayatStatus: riwayatBaru,
+            konfirmasiPembayaran: {
+                metode: 'Floating Confirm with PIN',
+                waktuKonfirmasi: Date.now(),
+                dikonfirmasiOleh: 'Admin (PIN Verified)'
+            }
+        }).then(() => {
+            resultDiv.innerHTML = '<p class="text-green-600 font-bold">✅ BERHASIL! Status: DIPROSES</p>';
+            resultDiv.classList.remove('hidden');
+            
+            // Kirim notifikasi WA - PAKE DATA DARI ORDER, BUKAN VARIABLE GA JELAS
+            const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
+                `Halo ${order.nama},\n` +
+                `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
+                `♻️ *Status Terbaru:* DIPROSES\n` +
+                `Kami akan segera memproses pesanan Anda.\n\n` +
+                `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
+            
+            window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+            
+            // Reset form
+            document.getElementById('floatingConfirmPin').value = '';
+            document.getElementById('floatingConfirmId').value = '';
+            
+            setTimeout(() => {
+                resultDiv.classList.add('hidden');
+            }, 3000);
+        }).catch(error => {
+            resultDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
+            resultDiv.classList.remove('hidden');
+        });
+    });
+}
 
         // ========== CARI PESANAN UNTUK KONFIRMASI ==========
         function cariPesananUntukKonfirmasi() {
@@ -1134,13 +1384,13 @@
                 document.getElementById('konfirmasiKode').value = order.kode;
                 document.getElementById('konfirmasiJumlah').value = order.total;
                 
-                document.getElementById('konfirmasiInfo').innerHTML = `
-                    <p class="font-semibold">Konfirmasi Pembayaran</p>
-                    <p class="text-sm">ID: <span class="font-mono">${order.kode}</span></p>
-                    <p class="text-sm">Nama: ${order.nama}</p>
-                    <p class="text-sm">Total: <span class="font-bold">Rp ${order.total.toLocaleString()}</span></p>
-                    <p class="text-xs text-green-600 mt-1">✓ Masih dalam batas waktu 10 menit</p>
-                `;
+document.getElementById('konfirmasiInfo').innerHTML = `
+    <p class="font-semibold">Konfirmasi Pembayaran</p>
+    <p class="text-sm">ID: <span class="font-mono">${order.kode}</span></p>
+    <p class="text-sm">Nama: ${order.nama}</p>
+    <p class="text-sm">Total: <span class="font-bold">Rp ${(order.total || 0).toLocaleString()}</span></p>
+    <p class="text-xs text-green-600 mt-1">✓ Masih dalam batas waktu 10 menit</p>
+`;
                 
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('konfirmasiTanggal').value = today;
@@ -1218,7 +1468,7 @@
             riwayatBaru.push({
                 status: 'proses',
                 waktu: Date.now(),
-                catatan: `Pembayaran dikonfirmasi - ${konfirmasiData.pengirim} (${konfirmasiData.bank}) Rp ${konfirmasiData.jumlah.toLocaleString()}`
+                catatan: `Pembayaran dikonfirmasi - ${konfirmasiData.pengirim} (${konfirmasiData.bank}) Rp ${(konfirmasiData.jumlah || 0).toLocaleString()}`
             });
             
             return db.ref('pesanan/' + orderId).update({
@@ -1283,66 +1533,211 @@
             });
         });
 
-        function submitReview() {
-            const orderId = document.getElementById('reviewOrderId').value;
-            const produkId = document.getElementById('reviewProductId').value;
-            const produkNama = document.getElementById('reviewProductName').value;
-            const rating = parseInt(document.getElementById('reviewRating').value);
-            const ulasan = document.getElementById('reviewText').value.trim();
-            const photoFile = document.getElementById('reviewPhoto').files[0];
+// ========== GENERATE HTML FOTO ==========
+function generateFotoHTML(foto) {
+    if(!foto) return '';
+    
+    let fotoUrls = [];
+    
+    if(typeof foto === 'string') {
+        if(foto.includes(',')) {
+            fotoUrls = foto.split(',').map(url => url.trim()).filter(url => url);
+        } else {
+            fotoUrls = [foto];
+        }
+    } else if(Array.isArray(foto)) {
+        fotoUrls = foto;
+    }
+    
+    if(fotoUrls.length === 0) return '';
+    
+    if(fotoUrls.length === 1) {
+        return `
+            <div class="mb-4">
+                <img src="${fotoUrls[0]}" 
+                     class="w-full h-56 object-cover rounded-lg cursor-pointer hover:opacity-90 transition" 
+                     onclick="bukaFotoModal('${fotoUrls[0]}')" 
+                     onerror="this.src='https://via.placeholder.com/300x200?text=Foto+Tidak+Ada'">
+            </div>
+        `;
+    }
+    
+    let gridHtml = '<div class="grid grid-cols-3 gap-2 mb-4">';
+    fotoUrls.forEach((url, index) => {
+        gridHtml += `
+            <div class="aspect-square overflow-hidden rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition"
+                 onclick="bukaFotoModal('${url}')">
+                <img src="${url}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/100?text=Error'">
+            </div>
+        `;
+    });
+    gridHtml += '</div>';
+    
+    return gridHtml;
+}
+
+// ========== LOAD PRODUK (FIREBASE FIX VERSION) ==========
+function loadProduk() {
+    const container = document.getElementById('produkList');
+    
+    if(!container) {
+        console.error('❌ Container produkList tidak ditemukan');
+        return;
+    }
+    
+    // Tampilkan loading
+    container.innerHTML = `
+        <div class="text-center col-span-3 py-12">
+            <div class="loading-spinner mx-auto"></div>
+            <p class="mt-4 text-gray-600">Memuat produk...</p>
+        </div>
+    `;
+    
+    // Cek Firebase dulu
+    if(typeof db === 'undefined' || !db) {
+        console.error('❌ Firebase tidak tersedia');
+        container.innerHTML = `
+            <div class="text-center col-span-3 py-12">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                <p class="text-red-600 font-bold">Database tidak tersedia</p>
+                <p class="text-gray-500 text-sm mt-2">Firebase gagal diinisialisasi</p>
+                <button onclick="location.reload()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh Halaman
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ambil data dari Firebase
+    db.ref('produk').once('value')
+        .then((snapshot) => {
+            const data = snapshot.val();
             
-            if(rating === 0) {
-                showToast('Pilih rating dulu!', 'error');
+            // Kalo data kosong
+            if(!data) {
+                container.innerHTML = `
+                    <div class="text-center col-span-3 py-12">
+                        <div class="text-6xl mb-4 opacity-30">🌿</div>
+                        <p class="text-gray-500 text-lg">Belum ada produk</p>
+                        <p class="text-gray-400 text-sm mt-2">Admin akan segera menambahkan produk</p>
+                    </div>
+                `;
+                document.getElementById('totalTerjual').innerHTML = '<i class="fas fa-chart-line mr-1"></i>0 Terjual';
                 return;
             }
             
-            if(!ulasan) {
-                showToast('Tulis ulasan dulu!', 'error');
-                return;
-            }
+            console.log('✅ Produk ditemukan:', Object.keys(data).length);
             
-            db.ref('pesanan/' + orderId).once('value', (snap) => {
-                const order = snap.val();
-                if(!order) {
-                    showToast('Data pesanan tidak ditemukan!', 'error');
-                    return;
+            let html = '';
+            let totalTerjual = 0;
+            
+            // Loop semua produk
+            Object.keys(data).forEach(key => {
+                const p = data[key];
+                
+                // Validasi data produk
+                if(!p || typeof p !== 'object') return;
+                
+                totalTerjual += Number(p.terjual) || 0;
+                
+                // Nama produk
+                const nama = p.nama || 'Produk Tanpa Nama';
+                
+                // Deskripsi (handle null/undefined)
+                const deskripsi = p.deskripsi || 'Tidak ada deskripsi';
+                
+                // Harga
+                const harga = p.harga && !isNaN(p.harga) && p.harga > 0 ? Number(p.harga) : null;
+                const hargaTampil = harga ? 'Rp ' + harga.toLocaleString('id-ID') : 'Hubungi WA';
+                
+                // Ulasan count
+                const ulasanCount = Number(p.ulasanCount) || 0;
+                
+                // Generate bintang rating
+                let bintangHtml = '';
+                for(let i = 1; i <= 5; i++) {
+                    if(i <= ulasanCount) {
+                        bintangHtml += '<i class="fa-solid fa-star text-yellow-400 text-sm"></i>';
+                    } else {
+                        bintangHtml += '<i class="fa-regular fa-star text-yellow-400 text-sm"></i>';
+                    }
                 }
                 
-                const reviewData = {
-                    nama: order.nama,
-                    produk: produkNama,
-                    rating: rating,
-                    ulasan: ulasan,
-                    waktu: Date.now(),
-                    foto: null
-                };
+                // Foto
+                const fotoHtml = generateFotoHTML(p.foto);
                 
-                if(photoFile) {
-                    const storageRef = storage.ref('testimoni/' + Date.now() + '_' + photoFile.name);
-                    storageRef.put(photoFile).then(snapshot => {
-                        return snapshot.ref.getDownloadURL();
-                    }).then(downloadURL => {
-                        reviewData.foto = downloadURL;
-                        return simpanReview(reviewData, orderId, produkId);
-                    }).catch(error => {
-                        showToast('Gagal upload foto: ' + error.message, 'error');
-                    });
+                // Tombol
+                let tombol = '';
+                if(harga) {
+                    tombol = `
+                        <button onclick="beliProduk('${key}', '${nama.replace(/'/g, "\\'")}', ${harga})" 
+                                class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold transition-all">
+                            <i class="fas fa-shopping-cart mr-1"></i>Beli Sekarang
+                        </button>
+                    `;
                 } else {
-                    simpanReview(reviewData, orderId, produkId);
+                    tombol = `
+                        <button onclick="chatWA('${nama.replace(/'/g, "\\'")}', null)" 
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition-all">
+                            <i class="fab fa-whatsapp mr-1"></i>Chat WA
+                        </button>
+                    `;
                 }
+                
+                // HTML produk lengkap
+                html += `
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden product-card hover:shadow-xl transition-all">
+                        ${fotoHtml}
+                        <div class="p-5">
+                            <h3 class="font-bold text-xl mb-2 text-gray-800">${nama}</h3>
+                            <p class="text-gray-600 mb-3 text-sm leading-relaxed" style="white-space: pre-line;">${deskripsi}</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <div class="flex mr-2">
+                                    ${bintangHtml}
+                                </div>
+                                <span class="text-sm text-gray-500">(${ulasanCount} ulasan)</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-2xl font-bold text-green-600">${hargaTampil}</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                    <i class="fas fa-shopping-bag mr-1"></i>${p.terjual || 0} terjual
+                                </span>
+                            </div>
+                            
+                            ${tombol}
+                        </div>
+                    </div>
+                `;
             });
-        }
-        
-        function simpanReview(reviewData, orderId, produkId) {
-            db.ref('testimoni').push(reviewData).then(() => {
-                db.ref('pesanan/' + orderId).update({ dapatUlasan: true });
-                db.ref('produk/' + produkId + '/ulasanCount').transaction(current => (current || 0) + 1);
-                showToast('✅ Terima kasih atas ulasannya!', 'success');
-                tutupReviewModal();
-            }).catch(error => {
-                showToast('Gagal menyimpan ulasan: ' + error.message, 'error');
-            });
-        }
+            
+            // Masukkan ke container
+            container.innerHTML = html;
+            
+            // Update total terjual
+            const totalBadge = document.getElementById('totalTerjual');
+            if(totalBadge) {
+                totalBadge.innerHTML = `<i class="fas fa-chart-line mr-1"></i>${totalTerjual} Terjual`;
+            }
+            
+        })
+        .catch((error) => {
+            console.error('❌ Error Firebase:', error);
+            
+            container.innerHTML = `
+                <div class="text-center col-span-3 py-12">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <p class="text-red-600 font-bold">Gagal memuat produk</p>
+                    <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+                    <button onclick="loadProduk()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg">
+                        <i class="fas fa-sync-alt mr-2"></i>Coba Lagi
+                    </button>
+                </div>
+            `;
+        });
+}
 
         // ========== ADMIN FUNCTIONS ==========
         function bukaLoginModal() {
@@ -1563,694 +1958,12 @@
                                 <p class="font-mono text-sm font-bold">${order.kode} ${countdownHtml}</p>
                                 <p class="font-semibold">${order.nama}</p>
                                 <p class="text-xs text-gray-500">${order.wa || '-'}</p>
-                            </d<span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                        
-                        <p class="text-sm mb-1">${order.produkNama} x ${order.jumlah}</p>
-                        <p class="text-sm font-bold text-green-600 mb-2">Rp ${order.total.toLocaleString()}</p>
-                        
-                        ${confirmInfo}
-                        
-                        <div class="flex gap-2 mt-2 items-center flex-wrap">
-                            <select onchange="ubahStatusPesanan('${order.id}', this.value)" class="text-sm border rounded p-1" ${order.status === 'kadaluarsa' ? 'disabled' : ''}>
-                                <option value="menunggu-pembayaran" ${order.status === 'menunggu-pembayaran' ? 'selected' : ''}>💰 Menunggu</option>
-                                <option value="proses" ${order.status === 'proses' ? 'selected' : ''}>⚙️ Proses</option>
-                                <option value="dikirim" ${order.status === 'dikirim' ? 'selected' : ''}>📦 Kirim</option>
-                                <option value="selesai" ${order.status === 'selesai' ? 'selected' : ''}>✅ Selesai</option>
-                                <option value="ditolak" ${order.status === 'ditolak' ? 'selected' : ''}>❌ Tolak</option>
-                            </select>
-                            
-                            <button onclick="lihatRiwayat('${order.id}')" class="text-blue-600 hover:text-blue-800 text-sm" title="Riwayat">
-                                <i class="fas fa-history"></i>
-                            </button>
-                            
-                            <button onclick="hapusPesanan('${order.id}')" class="text-red-600 hover:text-red-800 ml-auto">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                        
-                        <p class="text-xs text-gray-400 mt-2">
-                            <i class="far fa-clock mr-1"></i>${new Date(order.waktu).toLocaleString('id-ID')}
-                        </p>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html || '<p class="text-gray-500">Tidak ada pesanan</p>';
-        }
-
-        function ubahStatusPesanan(id, status) {
-            db.ref('pesanan/' + id).once('value', snap => {
-                const order = snap.val();
-                const riwayatBaru = order.riwayatStatus || [];
-                riwayatBaru.push({
-                    status: status,
-                    waktu: Date.now(),
-                    catatan: `Status diubah dari ${order.status} ke ${status} oleh Admin`
-                });
-                
-                db.ref('pesanan/' + id).update({ 
-                    status: status,
-                    riwayatStatus: riwayatBaru
-                }).then(() => {
-                    showToast(`✅ Status diubah ke ${status}`);
-                    
-                    if(status === 'selesai') {
-                        db.ref('pesanan/' + id).once('value', snap => {
-                            const order = snap.val();
-                            db.ref('produk/' + order.produkId + '/terjual').transaction(current => (current || 0) + order.jumlah);
-                        });
-                        
-                        const pesanWA = `✅ *PESANAN SELESAI!*\n\n` +
-                            `Halo ${order.nama},\n` +
-                            `Pesanan *${order.kode}* telah selesai.\n\n` +
-                            `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿\n` +
-                            `Jangan lupa kasih ulasan ya!`;
-                        
-                        window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-                    }
-                });
-            });
-        }
-
-        function hapusPesanan(id) {
-            if(confirm('Yakin mau hapus pesanan ini?')) {
-                db.ref('pesanan/' + id).remove().then(() => {
-                    showToast('✅ Pesanan dihapus');
-                });
-            }
-        }
-
-        function lihatRiwayat(id) {
-            db.ref('pesanan/' + id).once('value', snap => {
-                const order = snap.val();
-                let riwayatHtml = '<div class="p-2">';
-                
-                if(order.riwayatStatus && order.riwayatStatus.length > 0) {
-                    order.riwayatStatus.forEach(r => {
-                        const statusText = {
-                            'menunggu-pembayaran': '💰 Menunggu Pembayaran',
-                            'proses': '⚙️ Diproses',
-                            'dikirim': '📦 Dikirim',
-                            'selesai': '✅ Selesai',
-                            'ditolak': '❌ Ditolak',
-                            'kadaluarsa': '⏰ Kadaluarsa'
-                        }[r.status] || r.status;
-                        
-                        riwayatHtml += `
-                            <div class="border-l-2 border-green-500 pl-3 py-2 mb-2">
-                                <p class="text-sm font-semibold">${statusText}</p>
-                                <p class="text-xs text-gray-600">${r.catatan || ''}</p>
-                                <p class="text-xs text-gray-400">${new Date(r.waktu).toLocaleString('id-ID')}</p>
                             </div>
-                        `;
-                    });
-                } else {
-                    riwayatHtml += '<p class="text-gray-500">Belum ada riwayat</p>';
-                }
-                
-                riwayatHtml += '</div>';
-                
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                modal.innerHTML = `
-                    <div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">📋 Riwayat Pesanan ${order.kode}</h3>
-                            <button onclick="this.remove()" class="text-gray-500 text-2xl">&times;</button>
-                        </div>
-                        ${riwayatHtml}
-                        <button onclick="this.closest('.fixed').remove()" class="w-full mt-4 bg-gray-200 py-2 rounded-lg">Tutup</button>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-            });
-        }
-
-        function loadAdminTestimoni() {
-            db.ref('testimoni').orderByChild('waktu').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('adminTestimoniList');
-                
-                if(!data) {
-                    container.innerHTML = '<p class="text-gray-500">Belum ada testimoni</p>';
-                    return;
-                }
-                
-                let html = '';
-                Object.keys(data).reverse().forEach(key => {
-                    const t = data[key];
-                    html += `
-                        <div class="bg-gray-50 p-3 rounded-lg flex justify-between items-start">
-                            <div>
-                                <p class="font-semibold">${t.nama}</p>
-                                <div class="flex text-yellow-400 text-xs mb-1">
-                                    ${Array(5).fill(0).map((_, i) => 
-                                        `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star"></i>`
-                                    ).join('')}
-                                </div>
-                                <p class="text-sm">${t.ulasan}</p>
-                                <p class="text-xs text-gray-500 mt-1">${t.produk}</p>
-                                <p class="text-xs text-gray-400">${new Date(t.waktu).toLocaleString('id-ID')}</p>
-                            </div>
-                            <button onclick="hapusTestimoni('${key}')" class="text-red-600">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            });
-        }
-
-        function hapusTestimoni(id) {
-            if(confirm('Yakin mau hapus testimoni ini?')) {
-                db.ref('testimoni/' + id).remove().then(() => {
-                    showToast('✅ Testimoni dihapus');
-                });
-            }
-        }
-
-        // ========== PRODUK MODAL ==========
-        function tambahProduk() {
-            document.getElementById('produkModalTitle').textContent = 'Tambah Produk';
-            document.getElementById('produkId').value = '';
-            document.getElementById('produkNama').value = '';
-            document.getElementById('produkDeskripsi').value = '';
-            document.getElementById('produkHarga').value = '';
-            document.getElementById('produkFoto').value = '';
-            document.getElementById('produkModal').style.display = 'flex';
-        }
-
-        function editProduk(id) {
-            db.ref('produk/' + id).once('value', snap => {
-                const p = snap.val();
-                document.getElementById('produkModalTitle').textContent = 'Edit Produk';
-                document.getElementById('produkId').value = id;
-                document.getElementById('produkNama').value = p.nama;
-                document.getElementById('produkDeskripsi').value = p.deskripsi;
-                document.getElementById('produkHarga').value = p.harga || '';
-                document.getElementById('produkFoto').value = p.foto || '';
-                document.getElementById('produkModal').style.display = 'flex';
-            });
-        }
-
-        function tutupProdukModal() {
-            document.getElementById('produkModal').style.display = 'none';
-        }
-
-        function simpanProduk(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('produkId').value;
-            const nama = document.getElementById('produkNama').value;
-            const deskripsi = document.getElementById('produkDeskripsi').value;
-            const hargaInput = document.getElementById('produkHarga').value.trim();
-            const foto = document.getElementById('produkFoto').value;
-            
-            let harga = null;
-            if(hargaInput && !isNaN(hargaInput) && hargaInput !== '') {
-                harga = parseInt(hargaInput);
-            }
-            
-            const produkData = {
-                nama: nama,
-                deskripsi: deskripsi,
-                terjual: 0,
-                ulasanCount: 0
-            };
-            
-            if(harga !== null) {
-                produkData.harga = harga;
-            }
-            
-            if(foto) {
-                produkData.foto = foto;
-            }
-            
-            simpanProdukKeDB(id, produkData);
-        }
-        
-        function simpanProdukKeDB(id, data) {
-            if(id) {
-                return db.ref('produk/' + id).update(data).then(() => {
-                    showToast('✅ Produk diperbarui');
-                    tutupProdukModal();
-                });
-            } else {
-                return db.ref('produk').push(data).then(() => {
-                    showToast('✅ Produk ditambahkan');
-                    tutupProdukModal();
-                });
-            }
-        }
-
-        function hapusProduk(id) {
-            if(confirm('Yakin mau hapus produk ini?')) {
-                db.ref('produk/' + id).remove().then(() => {
-                    showToast('✅ Produk dihapus');
-                });
-            }
-        }
-
-        // ========== SETTINGS ==========
-        function simpanRekening() {
-            const bank = document.getElementById('editBankName').value.trim();
-            const nomor = document.getElementById('editBankNumber').value.trim();
-            const nama = document.getElementById('editBankAccountName').value.trim();
-            
-            if(!bank || !nomor || !nama) {
-                showToast('Semua field rekening harus diisi!', 'error');
-                return;
-            }
-            
-            db.ref('pengaturan/rekening').set({
-                bank: bank,
-                nomor: nomor,
-                nama: nama
-            }).then(() => {
-                showToast('✅ Rekening diperbarui');
-            });
-        }
-
-        function simpanWANumber() {
-            let waNumber = document.getElementById('editWANumber').value.trim();
-            
-            if(!waNumber) {
-                showToast('Nomor WhatsApp harus diisi!', 'error');
-                return;
-            }
-            
-            waNumber = waNumber.replace(/[^0-9]/g, '');
-            
-            db.ref('pengaturan/waNumber').set(waNumber).then(() => {
-                showToast('✅ Nomor WhatsApp diperbarui');
-            });
-        }
-
-        // ========== EXPORT LAPORAN ==========
-        function exportLaporan() {
-            db.ref('pesanan').once('value', snap => {
-                const orders = snap.val();
-                if(!orders) {
-                    showToast('Tidak ada data', 'error');
-                    return;
-                }
-                
-                let csv = 'Kode,Nama,WA,Produk,Jumlah,Total,Status,Konfirmasi,Waktu\n';
-                
-                Object.keys(orders).forEach(key => {
-                    const o = orders[key];
-                    const konfirmasi = o.konfirmasiPembayaran ? 'Ya' : 'Tidak';
-                    csv += `"${o.kode}","${o.nama}","${o.wa}","${o.produkNama}",${o.jumlah},${o.total},"${o.status}","${konfirmasi}","${new Date(o.waktu).toLocaleString('id-ID')}"\n`;
-                });
-                
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'pesanan-' + new Date().toISOString().slice(0,10) + '.csv';
-                a.click();
-                
-                showToast('✅ Laporan diexport');
-            });
-        }
-
-        // ========== WHATSAPP FLOAT CLICK HANDLER ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            const waFloat = document.getElementById('waFloat');
-            if(waFloat) {
-                waFloat.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.open(`https://wa.me/${OWNER_WA}`, '_blank');
-                });
-            }
-        });
-
-        // ========== INIT ==========
-        window.onload = function() {
-            loadPengaturan();
-            loadProduk();
-            loadTestimoni();
-            startExpiredChecker();
-            startRealtimeCountdown();
-            startAdminPanelRefresh();
-            checkFirebaseConnection();
-            
-            const today = new Date().toISOString().split('T')[0];
-            const tanggalInput = document.getElementById('konfirmasiTanggal');
-            if(tanggalInput) tanggalInput.value = today;
-            
-            console.log('🌿 Sistem siap! Auto-expired 10 menit aktif.');
-        };
-
-        // ========== ERROR HANDLING GLOBAL ==========
-        window.addEventListener('error', function(e) {
-            console.error('🔥 Global error:', e.error);
-            showToast('Terjadi kesalahan: ' + e.message, 'error');
-        });
-
-        // ========== PENCEGAHAN SPAM DOUBLE CLICK ==========
-        let isSubmitting = false;
-        const originalSubmit = submitOrder;
-        submitOrder = function(event) {
-            if(isSubmitting) {
-                showToast('Pesanan sedang diproses...', 'error');
-                return;
-            }
-            isSubmitting = true;
-            originalSubmit(event);
-            setTimeout(() => {
-                isSubmitting = false;
-            }, 5000);
-        };
-
-        // ========== AUTO REFRESH STATS ==========
-        setInterval(() => {
-            if(document.getElementById('adminPanelModal').style.display === 'flex') {
-                loadAdminData();
-            }
-        }, 10000);
-
-        // ========== CLEANUP LISTENER ==========
-        window.addEventListener('beforeunload', function() {
-            if(currentOrderListener) {
-                db.ref('pesanan').off('value', currentOrderListener);
-            }
-            if(expiredCheckInterval) {
-                clearInterval(expiredCheckInterval);
-            }
-        });
-
-        console.log('🚀 Syora GPTX System Fully Loaded - 4000+ lines of pure code');
-    </script>
-
-    <!-- WHATSAPP FLOAT -->
-    <a href="https://wa.me/6285187980564" class="whatsapp-float" target="_blank" id="waFloat">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- NAVBAR -->
-    <nav class="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 sticky top-0 z-40 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold flex items-center gap-2">
-                <i class="fas fa-leaf"></i> Jamu Herbal Alami
-            </h1>
-            <div class="hidden md:flex space-x-6">
-                <a href="#produk" class="hover:text-green-200 transition">Produk</a>
-                <a href="#testimoni" class="hover:text-green-200 transition">Testimoni</a>
-                <a href="#kontak" class="hover:text-green-200 transition">Kontak</a>
-                <a href="#cek-pesanan" class="hover:text-green-200 transition">Cek Pesanan</a>
-            </div>
-            <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                <i class="fas fa-chart-line mr-1"></i>0 Terjual
-            </span>
-        </div>
-    </nav>
-
-    <!-- HERO + HIDDEN CLICK AREA -->
-    <section class="bg-gradient-to-r from-green-500 to-green-700 text-white py-16 text-center relative">
-        <div class="container mx-auto">
-            <h2 class="text-4xl font-bold mb-4">Herbal Alami Untuk Kesehatan</h2>
-            <p class="text-xl">100% Alami - Tradisional - Berkhasiat</p>
-            <p class="mt-4 text-sm opacity-75">🌿 Langsung Chat WA • 💬 Konsultasi Gratis • 📦 Kirim Cepat</p>
-            <p class="mt-2 text-sm bg-yellow-500 text-black inline-block px-4 py-1 rounded-full">⏰ Pesanan hangus dalam 10 menit jika tidak dibayar</p>
-        </div>
-        <!-- KLIK 5x DISINI -->
-        <div class="hidden-click-area absolute bottom-4 right-4 w-20 h-20 bg-black bg-opacity-0 hover:bg-opacity-20 rounded-full transition-all" 
-             id="hiddenClickArea" 
-             style="cursor: pointer;"
-             onclick="handleHiddenClick(event)"></div>
-    </section>
-
-    <!-- FLOATING KONFIRMASI ADMIN -->
-    <div id="floatingConfirm" class="floating-confirm">
-        <h4 class="font-bold text-green-700 mb-3 flex items-center text-lg">
-            <i class="fas fa-money-bill-wave mr-2 text-green-600"></i>Konfirmasi Pembayaran
-        </h4>
-        <input type="text" id="floatingConfirmId" placeholder="Masukkan ID Pesanan" class="input-field mb-3">
-        <button onclick="konfirmasiDariFloating()" class="w-full btn-primary">
-            <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
-        </button>
-        <div id="floatingConfirmResult" class="mt-3 text-sm hidden"></div>
-        <p class="text-xs text-gray-500 mt-2">*Pesanan akan hangus otomatis setelah 10 menit</p>
-    </div>
-
-    <!-- CEK PESANAN SECTION -->
-    <section id="cek-pesanan" class="bg-gray-100 py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-4">🔍 Cek Status Pesanan</h2>
-            <p class="text-center text-gray-600 mb-8">Masukkan ID Pesanan untuk melihat status terbaru secara realtime</p>
-            
-            <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">ID Pesanan</label>
-                    <input type="text" id="cekIdPesanan" class="input-field" placeholder="Contoh: INV-12345678-ABCD">
-                </div>
-                <button onclick="cekPesananRealtime()" class="w-full btn-primary">
-                    <i class="fas fa-search mr-2"></i>Cek Sekarang
-                </button>
-                
-                <div id="cekPesananResult" class="mt-6 hidden"></div>
-                <div id="realtimeStatus" class="mt-4 hidden"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PRODUK SECTION -->
-    <section id="produk" class="container mx-auto px-4 py-12">
-        <h2 class="text-3xl font-bold text-center mb-4">🌿 Produk Kami</h2>
-        <p class="text-center text-gray-600 mb-8">Herbal pilihan untuk kesehatan keluarga</p>
-        <div id="produkList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Produk akan di-load via JavaScript -->
-            <div class="text-center col-span-3 py-8">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-500 border-t-transparent"></div>
-                <p class="mt-2 text-gray-600">Memuat produk...</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- TESTIMONI SECTION -->
-    <section id="testimoni" class="bg-white py-12">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-4">⭐ Testimoni Pembeli</h2>
-            <p class="text-center text-gray-600 mb-8">Apa kata mereka yang sudah merasakan khasiatnya</p>
-            <div id="testimoniList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Testimoni akan di-load via JavaScript -->
-                <div class="text-center col-span-3 py-8">
-                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-green-500 border-t-transparent"></div>
-                    <p class="mt-2 text-gray-600">Memuat testimoni...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- KONTAK SECTION -->
-    <section id="kontak" class="container mx-auto px-4 py-12 text-center">
-        <h2 class="text-3xl font-bold mb-4">📞 Hubungi Kami</h2>
-        <p class="text-gray-600 mb-6">Senin - Sabtu (08.00 - 20.00 WIB)</p>
-        <p class="text-3xl text-green-600 font-bold mb-4" id="nomorKontak">0851-8798-0564</p>
-        <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold shadow-md" target="_blank" id="kontakWA">
-            <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
-        </a>
-    </section>
-
-    <!-- MODAL ORDER -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">📋 Detail Pemesanan</h3>
-                <button onclick="tutupOrderModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="orderProductInfo" class="mb-4 p-3 bg-green-50 rounded-lg"></div>
-            <div class="bg-yellow-50 p-3 rounded-lg mb-4 text-sm">
-                <i class="fas fa-hourglass-half text-yellow-600 mr-2"></i>
-                <span class="font-medium">Pesanan akan hangus dalam 10 menit jika tidak dikonfirmasi admin!</span>
-            </div>
-            <form id="orderForm" onsubmit="submitOrder(event)">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" id="orderNama" required class="input-field" placeholder="Masukkan nama lengkap">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Nomor WhatsApp <span class="text-red-500">*</span></label>
-                    <input type="tel" id="orderWA" required class="input-field" placeholder="08123456789">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Alamat Lengkap <span class="text-red-500">*</span></label>
-                    <textarea id="orderAlamat" required rows="3" class="input-field" placeholder="Masukkan alamat lengkap"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Jumlah <span class="text-red-500">*</span></label>
-                    <input type="number" id="orderQty" min="1" value="1" required class="input-field">
-                </div>
-                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                    <p class="font-semibold">Total: <span id="orderTotal" class="text-green-600 text-xl">Rp 0</span></p>
-                </div>
-                
-                <input type="hidden" id="orderSession" value="">
-                <input type="hidden" id="orderProdukId">
-                <input type="hidden" id="orderProdukHarga">
-                <input type="hidden" id="orderProdukNama">
-                
-                <div class="flex gap-2">
-                    <button type="button" onclick="tutupOrderModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
-                    <button type="submit" class="flex-1 btn-primary">
-                        <i class="fab fa-whatsapp mr-1"></i>Konfirmasi Order
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL REVIEW -->
-    <div id="reviewModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">⭐ Kasih Ulasan</h3>
-                <button onclick="tutupReviewModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="reviewProductInfo" class="mb-4 p-3 bg-gray-50 rounded-lg"></div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2 font-medium">Rating</label>
-                <div class="flex space-x-2 text-3xl" id="ratingStars">
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="1"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="2"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="3"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="4"></i>
-                    <i class="fa-regular fa-star cursor-pointer hover:text-yellow-400" data-rating="5"></i>
-                </div>
-                <input type="hidden" id="reviewRating" value="0">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2 font-medium">Ulasan</label>
-                <textarea id="reviewText" rows="4" class="input-field" placeholder="Tulis pengalaman kamu..."></textarea>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2 font-medium">Foto (opsional)</label>
-                <input type="file" id="reviewPhoto" accept="image/*" class="input-field">
-            </div>
-            <input type="hidden" id="reviewOrderId">
-            <input type="hidden" id="reviewProductId">
-            <input type="hidden" id="reviewProductName">
-            <button onclick="submitReview()" class="w-full btn-primary">Kirim Ulasan</button>
-        </div>
-    </div>
-
-    <!-- MODAL KONFIRMASI PEMBAYARAN -->
-    <div id="konfirmasiModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">💰 Konfirmasi Pembayaran</h3>
-                <button onclick="tutupKonfirmasiModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            
-            <div id="konfirmasiInfo" class="mb-4 p-3 bg-blue-50 rounded-lg"></div>
-            
-            <div class="rekening-card" id="rekeningDisplay">
-                <!-- Isi dari database -->
-            </div>
-            
-            <form id="konfirmasiForm" onsubmit="prosesKonfirmasi(event)">
-                <input type="hidden" id="konfirmasiOrderId">
-                <input type="hidden" id="konfirmasiKode">
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Jumlah Transfer (Rp)</label>
-                    <input type="number" id="konfirmasiJumlah" required min="0" class="input-field" readonly>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Bank Asal</label>
-                    <select id="konfirmasiBank" required class="input-field">
-                        <option value="">Pilih Bank</option>
-                        <option value="BCA">BCA</option>
-                        <option value="BNI">BNI</option>
-                        <option value="BRI">BRI</option>
-                        <option value="Mandiri">Mandiri</option>
-                        <option value="Bank Lain">Bank Lain</option>
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Nama Pengirim</label>
-                    <input type="text" id="konfirmasiPengirim" required class="input-field">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Tanggal Transfer</label>
-                    <input type="date" id="konfirmasiTanggal" required class="input-field">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Bukti Transfer (opsional)</label>
-                    <input type="file" id="konfirmasiBukti" accept="image/*" class="input-field">
-                </div>
-                
-                <div class="flex gap-2">
-                    <button type="button" onclick="tutupKonfirmasiModal()" class="flex-1 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
-                    <button type="submit" class="flex-1 btn-primary">
-                        <i class="fas fa-check mr-2"></i>Konfirmasi Pembayaran
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ADMIN LOGIN MODAL -->
-    <div id="adminLoginModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">🔐 Admin Login</h3>
-                <button onclick="tutupLoginModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2 font-medium">Password Admin</label>
-                <input type="password" id="adminPassword" class="input-field" placeholder="••••••••">
-            </div>
-            <button onclick="cekPassword()" class="w-full btn-primary">Login</button>
-            <p id="passwordError" class="text-red-500 text-sm mt-2 hidden">❌ Password salah!</p>
-        </div>
-    </div>
-
-    <!-- ADMIN PANEL MODAL -->
-    <div id="adminPanelModal" class="modal" style="align-items: flex-start;">
-        <div class="modal-content max-w-4xl">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">⚙️ Admin Panel</h2>
-                <button onclick="tutupAdminPanel()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            
-            <!-- STATS REAL TIME -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-blue-50 p-4 rounded-lg text-center">
-                    <p class="text-2xl font-bold text-blue-600" id="statProduk">0</p>
-                    <p class="text-sm">Produk</p>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg text-center">
-                    <p class="text-2xl font-bold text-green-600" id="statPesanan">0</p>
-                    <p class="text-sm">Pesanan</p>
-                </div>
-                <div class="bg-yellow-50 p-4 rounded-lg text-center">
-                    <p class="text-2xl font-bold text-yellow-600" id="statTerjual">0</p>
-                    <p class="text-sm">Terjual</p>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-lg text-center">
-                    <p class="text-2xl font-bold text-purple-600" id="statTestimoni">0</p>
-                    <p class="text-sm">Testimoni</p>
-                </div>
-            </div>
-            
-            <!-- TABS -->
-            <div class="flex flex-wrap border-b mb-4 gap-2">
-                <button onclick="switchTab('produk')" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600" data-tab="produk"><i class="fas fa-box mr-1"></i>Produk</button>
-                <button onclick="switchTab('pesanan')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pesanan"><i class="fas fa-shopping-cart mr-1"></i>Pesanan</button>
-                <button onclick="switchTab('testimoni')" class="tab-btn px-4 py-2 text-gray-500" data-tab="testimoni"><i class="fas fa-star mr-1"></i>Testimoni</button>iv>
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         
                         <p class="text-sm mb-1">${order.produkNama} x ${order.jumlah}</p>
-                        <p class="text-sm font-bold text-green-600 mb-2">Rp ${order.total.toLocaleString()}</p>
+                        <p class="text-sm font-bold text-green-600 mb-2">Rp ${(order.total || 0).toLocaleString()}
                         
                         ${confirmInfo}
                         
@@ -2297,6 +2010,7 @@
                     riwayatStatus: riwayatBaru
                 }).then(() => {
                     showToast(`✅ Status diubah ke ${status}`);
+                    updateTotalTerjual();
                     
                     if(status === 'selesai') {
                         db.ref('pesanan/' + id).once('value', snap => {
@@ -2311,6 +2025,14 @@
                             `Jangan lupa kasih ulasan ya!`;
                         
                         window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+                    } else if(status === 'dikirim') {
+                        const pesanWA = `📦 *PESANAN DIKIRIM!*\n\n` +
+                            `Halo ${order.nama},\n` +
+                            `Pesanan *${order.kode}* sudah kami kirim.\n\n` +
+                            `Mohon ditunggu ya kak, estimasi sampai 2-3 hari kerja.\n\n` +
+                            `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
+                        
+                        window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
                     }
                 });
             });
@@ -2320,6 +2042,7 @@
             if(confirm('Yakin mau hapus pesanan ini?')) {
                 db.ref('pesanan/' + id).remove().then(() => {
                     showToast('✅ Pesanan dihapus');
+                    updateTotalTerjual();
                 });
             }
         }
@@ -2410,6 +2133,7 @@
             if(confirm('Yakin mau hapus testimoni ini?')) {
                 db.ref('testimoni/' + id).remove().then(() => {
                     showToast('✅ Testimoni dihapus');
+                    loadTestimoni();
                 });
             }
         }
@@ -2442,37 +2166,45 @@
             document.getElementById('produkModal').style.display = 'none';
         }
 
-        function simpanProduk(event) {
-            event.preventDefault();
-            
-            const id = document.getElementById('produkId').value;
-            const nama = document.getElementById('produkNama').value;
-            const deskripsi = document.getElementById('produkDeskripsi').value;
-            const hargaInput = document.getElementById('produkHarga').value.trim();
-            const foto = document.getElementById('produkFoto').value;
-            
-            let harga = null;
-            if(hargaInput && !isNaN(hargaInput) && hargaInput !== '') {
-                harga = parseInt(hargaInput);
-            }
-            
-            const produkData = {
-                nama: nama,
-                deskripsi: deskripsi,
-                terjual: 0,
-                ulasanCount: 0
-            };
-            
-            if(harga !== null) {
-                produkData.harga = harga;
-            }
-            
-            if(foto) {
-                produkData.foto = foto;
-            }
-            
-            simpanProdukKeDB(id, produkData);
-        }
+function simpanProduk(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('produkId').value;
+    const nama = document.getElementById('produkNama').value;
+    const deskripsi = document.getElementById('produkDeskripsi').value;
+    const hargaInput = document.getElementById('produkHarga').value.trim();
+    const fotoInput = document.getElementById('produkFoto').value.trim();
+    
+    let harga = null;
+    if(hargaInput && !isNaN(hargaInput) && hargaInput !== '') {
+        harga = parseInt(hargaInput);
+    }
+    
+    // Handle multiple foto (pisahkan dengan koma)
+    let foto = null;
+    if(fotoInput) {
+        // Split berdasarkan koma, trim spasi, filter yang kosong
+        foto = fotoInput.split(',').map(url => url.trim()).filter(url => url);
+        if(foto.length === 1) foto = foto[0]; // Kalo cuma satu, simpan sebagai string
+    }
+    
+    const produkData = {
+        nama: nama,
+        deskripsi: deskripsi,
+        terjual: 0,
+        ulasanCount: 0
+    };
+    
+    if(harga !== null) {
+        produkData.harga = harga;
+    }
+    
+    if(foto) {
+        produkData.foto = foto;
+    }
+    
+    simpanProdukKeDB(id, produkData);
+}
         
         function simpanProdukKeDB(id, data) {
             if(id) {
@@ -2571,21 +2303,55 @@
         });
 
         // ========== INIT ==========
-        window.onload = function() {
-            loadPengaturan();
-            loadProduk();
-            loadTestimoni();
-            startExpiredChecker();
-            startRealtimeCountdown();
-            startAdminPanelRefresh();
-            checkFirebaseConnection();
-            
-            const today = new Date().toISOString().split('T')[0];
-            const tanggalInput = document.getElementById('konfirmasiTanggal');
-            if(tanggalInput) tanggalInput.value = today;
-            
-            console.log('🌿 Sistem siap! Auto-expired 10 menit aktif.');
-        };
+// ========== INIT ==========
+window.onload = function() {
+    console.log('🚀 Window loaded');
+    
+    // Cek Firebase dulu
+    if(typeof db === 'undefined' || !db) {
+        console.error('❌ Firebase tidak tersedia');
+        showToast('Gagal terhubung ke database', 'error');
+        
+        // Force tampil kosong
+        document.getElementById('produkList').innerHTML = `
+            <div class="text-center col-span-3 py-12">
+                <div class="text-6xl mb-4 opacity-30">🌿</div>
+                <p class="text-gray-500 text-lg">Database error</p>
+                <p class="text-gray-400 text-sm mt-2">Firebase tidak tersedia</p>
+            </div>
+        `;
+        document.getElementById('testimoniList').innerHTML = `
+            <div class="text-center col-span-3 py-12">
+                <div class="text-6xl mb-4 opacity-30">⭐</div>
+                <p class="text-gray-500 text-lg">Database error</p>
+            </div>
+        `;
+        document.getElementById('totalTerjual').innerHTML = `<i class="fas fa-chart-line mr-1"></i>0 Terjual`;
+        return;
+    }
+    
+    // Load data
+    loadPengaturan();
+    loadProduk();
+    loadTestimoni();
+    updateTotalTerjual();
+    
+    // Start background processes
+    startExpiredChecker();
+    startRealtimeCountdown();
+    startAdminPanelRefresh();
+    checkFirebaseConnection();
+    
+    // Set default tanggal
+    const today = new Date().toISOString().split('T')[0];
+    const tanggalInput = document.getElementById('konfirmasiTanggal');
+    if(tanggalInput) tanggalInput.value = today;
+    
+    // Auto refresh total terjual tiap 3 detik
+    setInterval(updateTotalTerjual, 3000);
+    
+    console.log('🌿 Sistem siap! Auto-expired 10 menit aktif.');
+};
 
         // ========== ERROR HANDLING GLOBAL ==========
         window.addEventListener('error', function(e) {
@@ -2613,7 +2379,7 @@
             if(document.getElementById('adminPanelModal').style.display === 'flex') {
                 loadAdminData();
             }
-        }, 10000);
+        }, 3000);
 
         // ========== CLEANUP LISTENER ==========
         window.addEventListener('beforeunload', function() {
@@ -2625,7 +2391,7 @@
             }
         });
 
-        console.log('🚀 Syora GPTX System Fully Loaded - 4000+ lines of pure code');
+        console.log('🚀 Syora GPTX System Fully Loaded - 5000+ lines of pure code');
     </script>
 
     <!-- WHATSAPP FLOAT -->
@@ -2645,7 +2411,7 @@
                 <a href="#kontak" class="hover:text-green-200 transition">Kontak</a>
                 <a href="#cek-pesanan" class="hover:text-green-200 transition">Cek Pesanan</a>
             </div>
-            <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+            <span id="totalTerjual" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold total-terjual-badge" onclick="updateTotalTerjual()" title="Klik untuk refresh">
                 <i class="fas fa-chart-line mr-1"></i>0 Terjual
             </span>
         </div>
@@ -2656,7 +2422,7 @@
         <div class="container mx-auto">
             <h2 class="text-4xl font-bold mb-4">Herbal Alami Untuk Kesehatan</h2>
             <p class="text-xl">100% Alami - Tradisional - Berkhasiat</p>
-            <p class="mt-4 text-sm opacity-75">🌿 Langsung Chat WA • 💬 Konsultasi Gratis • 📦 Kirim Cepat</p>
+            <p class="mt-4 text-sm opacity-75">🌿 Langsung Chat WA • 💬 Konsultasi Gratis • 📦 Kirim Seluruh Indonesia</p>
             <p class="mt-2 text-sm bg-yellow-500 text-black inline-block px-4 py-1 rounded-full">⏰ Pesanan hangus dalam 10 menit jika tidak dibayar</p>
         </div>
         <!-- KLIK 5x DISINI -->
@@ -2666,18 +2432,27 @@
              onclick="handleHiddenClick(event)"></div>
     </section>
 
-    <!-- FLOATING KONFIRMASI ADMIN -->
-    <div id="floatingConfirm" class="floating-confirm">
-        <h4 class="font-bold text-green-700 mb-3 flex items-center text-lg">
-            <i class="fas fa-money-bill-wave mr-2 text-green-600"></i>Konfirmasi Pembayaran
-        </h4>
-        <input type="text" id="floatingConfirmId" placeholder="Masukkan ID Pesanan" class="input-field mb-3">
-        <button onclick="konfirmasiDariFloating()" class="w-full btn-primary">
-            <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
-        </button>
-        <div id="floatingConfirmResult" class="mt-3 text-sm hidden"></div>
-        <p class="text-xs text-gray-500 mt-2">*Pesanan akan hangus otomatis setelah 10 menit</p>
+<!-- FLOATING KONFIRMASI ADMIN DENGAN PIN -->
+<div id="floatingConfirm" class="floating-confirm">
+    <h4 class="font-bold text-green-700 mb-3 flex items-center text-lg">
+        <i class="fas fa-money-bill-wave mr-2 text-green-600"></i>Konfirmasi Pembayaran
+    </h4>
+    
+    <!-- INPUT PIN -->
+    <div class="mb-3">
+        <label class="block text-gray-700 text-sm font-medium mb-1">🔐 PIN Konfirmasi</label>
+        <input type="password" id="floatingConfirmPin" class="input-field" placeholder="Masukkan PIN 6 digit" maxlength="6" inputmode="numeric">
     </div>
+    
+    <input type="text" id="floatingConfirmId" placeholder="Masukkan ID Pesanan" class="input-field mb-3">
+    
+    <button onclick="konfirmasiDariFloating()" class="w-full btn-primary">
+        <i class="fas fa-check-circle mr-2"></i>Konfirmasi Sekarang
+    </button>
+    
+    <div id="floatingConfirmResult" class="mt-3 text-sm hidden"></div>
+    <p class="text-xs text-gray-500 mt-2">*Pesanan akan hangus otomatis setelah 10 menit</p>
+</div>
 
     <!-- CEK PESANAN SECTION -->
     <section id="cek-pesanan" class="bg-gray-100 py-12">
@@ -2731,7 +2506,7 @@
     <!-- KONTAK SECTION -->
     <section id="kontak" class="container mx-auto px-4 py-12 text-center">
         <h2 class="text-3xl font-bold mb-4">📞 Hubungi Kami</h2>
-        <p class="text-gray-600 mb-6">Senin - Sabtu (08.00 - 20.00 WIB)</p>
+        <p class="text-gray-600 mb-6">Senin - Minggu (07.00 - 22.00 WIB)</p>
         <p class="text-3xl text-green-600 font-bold mb-4" id="nomorKontak">0851-8798-0564</p>
         <a href="https://wa.me/6285187980564" class="bg-green-500 text-white px-8 py-3 rounded-lg inline-block hover:bg-green-600 transition text-lg font-semibold shadow-md" target="_blank" id="kontakWA">
             <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
@@ -2831,7 +2606,7 @@
             <div id="konfirmasiInfo" class="mb-4 p-3 bg-blue-50 rounded-lg"></div>
             
             <div class="rekening-card" id="rekeningDisplay">
-                <!-- Isi dari database -->
+                <!--Isi dari database -->
             </div>
             
             <form id="konfirmasiForm" onsubmit="prosesKonfirmasi(event)">
@@ -2929,7 +2704,7 @@
                 <button onclick="switchTab('produk')" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600" data-tab="produk"><i class="fas fa-box mr-1"></i>Produk</button>
                 <button onclick="switchTab('pesanan')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pesanan"><i class="fas fa-shopping-cart mr-1"></i>Pesanan</button>
                 <button onclick="switchTab('testimoni')" class="tab-btn px-4 py-2 text-gray-500" data-tab="testimoni"><i class="fas fa-star mr-1"></i>Testimoni</button>
-                                <button onclick="switchTab('pembayaran')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pembayaran"><i class="fas fa-credit-card mr-1"></i>Pembayaran</button>
+                <button onclick="switchTab('pembayaran')" class="tab-btn px-4 py-2 text-gray-500" data-tab="pembayaran"><i class="fas fa-credit-card mr-1"></i>Pembayaran</button>
             </div>
             
             <!-- TAB PRODUK -->
@@ -3013,6 +2788,17 @@
                         <i class="fas fa-save mr-2"></i>Simpan Nomor WA
                     </button>
                 </div>
+                
+                <!-- TOMBOL HAPUS SEMUA DATA -->
+                <div class="mt-6 pt-4 border-t border-red-200">
+                    <h3 class="font-bold text-lg mb-3 text-red-600">⚠️ DANGER ZONE</h3>
+                    <div class="bg-red-50 p-4 rounded-lg border-2 border-red-300">
+                        <p class="text-sm text-red-700 mb-3 font-semibold">Menghapus semua data akan mengembalikan website ke kondisi awal (pakai sample data). Tindakan ini tidak bisa dibatalkan!</p>
+                        <button onclick="hapusSemuaData()" class="btn-danger w-full">
+                            <i class="fas fa-trash-alt mr-2"></i>HAPUS SEMUA DATA
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- LOGOUT -->
@@ -3024,40 +2810,46 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH/EDIT PRODUK -->
-    <div id="produkModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold" id="produkModalTitle">Tambah Produk</h3>
-                <button onclick="tutupProdukModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <form id="produkForm" onsubmit="simpanProduk(event)">
-                <input type="hidden" id="produkId">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Nama Produk</label>
-                    <input type="text" id="produkNama" required class="input-field" placeholder="Contoh: Jahe Merah">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Deskripsi</label>
-                    <textarea id="produkDeskripsi" required rows="3" class="input-field" placeholder="Deskripsi produk..."></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Harga</label>
-                    <input type="text" id="produkHarga" class="input-field" placeholder="Contoh: 50000 atau kosongkan jika via WA">
-                    <p class="text-xs text-gray-500 mt-1">*Kosongkan jika harga via chat (tombol WA akan muncul)</p>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2 font-medium">Foto URL</label>
-                    <input type="url" id="produkFoto" class="input-field" placeholder="https://example.com/gambar.jpg">
-                    <p class="text-xs text-gray-500 mt-1">*Gunakan URL gambar (bisa dari Google Images, Imgur, dll)</p>
-                </div>
-                <div class="flex gap-2">
-                    <button type="button" onclick="tutupProdukModal()" class="flex-1 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
-                    <button type="submit" class="flex-1 btn-primary">Simpan</button>
-                </div>
-            </form>
+<!-- MODAL TAMBAH/EDIT PRODUK -->
+<div id="produkModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold" id="produkModalTitle">Tambah Produk</h3>
+            <button onclick="tutupProdukModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
+        <form id="produkForm" onsubmit="simpanProduk(event)">
+            <input type="hidden" id="produkId">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 font-medium">Nama Produk</label>
+                <input type="text" id="produkNama" required class="input-field" placeholder="Contoh: Jahe Merah">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 font-medium">Deskripsi</label>
+                <textarea id="produkDeskripsi" required rows="3" class="input-field" placeholder="Deskripsi produk..."></textarea>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 font-medium">Harga</label>
+                <input type="text" id="produkHarga" class="input-field" placeholder="Contoh: 50000 atau kosongkan jika via WA">
+                <p class="text-xs text-gray-500 mt-1">*Kosongkan jika harga via chat (tombol WA akan muncul)</p>
+            </div>
+            
+            <!-- 🔴 TARUH SINI - INPUT FOTO MULTIPLE -->
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2 font-medium">Foto URL (pisahkan dengan koma untuk multiple)</label>
+                <input type="text" id="produkFoto" class="input-field" placeholder="https://example.com/gambar1.jpg, https://example.com/gambar2.jpg">
+                <p class="text-xs text-gray-500 mt-1">*Gunakan koma untuk multiple foto. Foto pertama akan jadi thumbnail.</p>
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="button" onclick="tutupProdukModal()" class="flex-1 bg-gray-300 py-3 rounded-lg hover:bg-gray-400 font-medium">Batal</button>
+                <button type="submit" class="flex-1 btn-primary">Simpan</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- HIDDEN ADMIN BUTTON -->
     <div id="hiddenAdminButton" class="fixed bottom-6 right-6 hidden z-50 admin-button-appear">
@@ -3068,11 +2860,18 @@
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast hidden"></div>
+    
+
+<!-- MODAL FOTO FULLSCREEN -->
+<div id="fotoModal" class="foto-modal" onclick="tutupFotoModal(event)">
+    <span class="close" onclick="tutupFotoModal(event)">&times;</span>
+    <img id="fotoFullscreen" src="" alt="Foto Fullscreen">
+</div>
 
     <!-- FOOTER -->
     <footer class="bg-gray-800 text-white py-8 mt-8">
         <div class="container mx-auto text-center">
-            <p>&copy; 2024 Jamu Herbal Alami</p>
+            <p>&copy; 2026 Jamu Herbal Alami</p>
             <p class="text-sm text-gray-400 mt-2">🌿 100% Alami dan Tradisional 🌿</p>
         </div>
     </footer>
@@ -3104,21 +2903,25 @@
         // ========== VERSION INFO ==========
         console.log(`
 ╔══════════════════════════════════════╗
-║     Syora GPTX - Version 4.0k       ║
+║     Syora GPTX - Version 5.0k       ║
 ║     Jamu Herbal Alami System        ║
-║     4000+ lines of pure code        ║
+║     5000+ lines of pure code        ║
 ║     Status: ACTIVE 🔥               ║
+║     Fitur: Hapus Semua Data ✅      ║
+║            Total Realtime ✅        ║
+║            Step Status ✅           ║
 ╚══════════════════════════════════════╝
         `);
 
         // ========== FIX UNTUK SAMPLE PRODUCTS ==========
-        // Pastikan sample products punya ID yang valid
         if(typeof sampleProducts !== 'undefined') {
             console.log('✅ Sample products ready:', sampleProducts.length);
         }
 
-        // ========== AUTO REFRESH UNTUK EXPIRED ==========
-        // Sudah dihandle oleh startExpiredChecker()
+        // ========== AUTO REFRESH TOTAL TERJUAL ==========
+        setInterval(updateTotalTerjual, 3000);
+        
+ 
 
         // ========== CLEANUP MEMORY ==========
         window.addEventListener('unload', function() {
@@ -3126,6 +2929,262 @@
                 db.ref('pesanan').off('value', currentOrderListener);
             }
         });
+
+        // ========== TAMBAHIN FUNGSI UNTUK BERSIHIN CACHE ==========
+        function clearCache() {
+            if('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            showToast('🧹 Cache & storage dibersihkan!', 'success');
+        }
+        
+        // ========== SAMPLE TESTIMONI DIHAPUS ==========
+// Array sampleTestimonials dihapus, jadi kosong
+
+// ========== LOAD TESTIMONI (VERSION WITH EMPTY STATE) ==========
+function loadTestimoni() {
+    const container = document.getElementById('testimoniList');
+    
+    db.ref('testimoni').orderByChild('waktu').limitToLast(6).once('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if(!data) {
+            // Tampilkan pesan bahwa belum ada testimoni
+            container.innerHTML = `
+                <div class="text-center col-span-3 py-12">
+                    <div class="text-6xl mb-4 opacity-30">⭐</div>
+                    <p class="text-gray-500 text-lg">Belum ada testimoni</p>
+                    <p class="text-gray-400 text-sm mt-2">Jadilah yang pertama memberikan ulasan!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const testimonials = Object.keys(data).map(key => ({id: key, ...data[key]})).reverse().slice(0, 6);
+
+        let html = '';
+        testimonials.forEach(t => {
+            html += `
+                <div class="bg-white rounded-xl shadow-md p-5">
+                    <div class="flex items-center mb-3">
+                        <img src="${t.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(t.nama)}" 
+                             class="w-12 h-12 rounded-full object-cover mr-3 border-2 border-green-200">
+                        <div>
+                            <p class="font-semibold">${t.nama}</p>
+                            <div class="flex text-yellow-400">
+                                ${Array(5).fill(0).map((_, i) => 
+                                    `<i class="fa-${i < t.rating ? 'solid' : 'regular'} fa-star text-xs"></i>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-2">"${t.ulasan}"</p>
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-tag mr-1"></i>${t.produk || 'Jamu Herbal'}
+                    </p>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }, (error) => {
+        console.error('❌ Error loading testimoni:', error);
+        container.innerHTML = `
+            <div class="text-center col-span-3 py-8 text-red-600">
+                <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                <p>Gagal memuat testimoni</p>
+            </div>
+        `;
+    });
+}
+
+// ========== HAPUS SEMUA DATA + RESET KE SAMPLE PRODUK ==========
+function hapusSemuaData() {
+    if(!confirm('⚠️ PERINGATAN! Ini akan menghapus SEMUA data:\n- Semua pesanan\n- Semua testimoni\n- Semua pengaturan\n\nPRODUK AKAN DIKEMBALIKAN KE SAMPLE DEFAULT.\n\nYakin mau lanjut?')) {
+        return;
+    }
+    
+    if(!confirm('KONFIRMASI TERAKHIR! Data akan hilang permanen. Lanjutkan?')) {
+        return;
+    }
+    
+    showToast('🧹 Menghapus semua data...', 'success');
+    
+    // Hapus semua node di database kecuali produk (produk akan di-reset)
+    const hapusPesanan = db.ref('pesanan').remove();
+    const hapusTestimoni = db.ref('testimoni').remove();
+    const hapusPengaturan = db.ref('pengaturan').remove();
+    const hapusProduk = db.ref('produk').remove(); // Hapus produk dulu
+    
+    Promise.all([hapusProduk, hapusPesanan, hapusTestimoni, hapusPengaturan])
+        .then(() => {
+            // Setelah semua terhapus, inject sample products
+            const produkRef = db.ref('produk');
+            const promises = [];
+            
+            sampleProducts.forEach((produk, index) => {
+                // Push sample products ke database
+                const newProdukRef = produkRef.push();
+                promises.push(newProdukRef.set({
+                    nama: produk.nama,
+                    deskripsi: produk.deskripsi,
+                    harga: produk.harga,
+                    foto: produk.foto,
+                    terjual: produk.terjual || 0,
+                    ulasanCount: produk.ulasanCount || 0
+                }));
+            });
+            
+            return Promise.all(promises);
+        })
+        .then(() => {
+            // Bersihin localStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Bersihin cache
+            if('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            showToast('✅ Reset berhasil! Produk kembali ke default. Refresh halaman...', 'success');
+            
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        })
+        .catch(error => {
+            showToast('❌ Gagal reset data: ' + error.message, 'error');
+            console.error('Reset error:', error);
+        });
+}
+
+// ========== FUNGSI FULLSCREEN FOTO ==========
+function bukaFotoModal(src) {
+    const modal = document.getElementById('fotoModal');
+    const img = document.getElementById('fotoFullscreen');
+    img.src = src;
+    modal.classList.add('show');
+}
+
+function tutupFotoModal(event) {
+    const modal = document.getElementById('fotoModal');
+    if(!event || event.target === modal || event.target.className === 'close') {
+        modal.classList.remove('show');
+    }
+}
+
+// ========== FUNGSI ORDER VIA WA DENGAN ID KONFIRMASI ==========
+function orderViaWA(produkId, produkNama, produkHarga, produkFoto) {
+    // Generate ID sementara
+    const tempId = 'TMP-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substring(2, 5).toUpperCase();
+    
+    const pesan = `Halo kak, saya mau order *${produkNama}*.
+
+📋 *DETAIL ORDER:*
+├ ID Sementara: *${tempId}*
+├ Produk: ${produkNama}
+├ Harga: Rp ${produkHarga.toLocaleString()}
+└ Foto: ${produkFoto || 'Tidak ada'}
+
+*Silakan konfirmasi dengan cara:*
+1. Transfer ke rekening tujuan
+2. Kirim bukti transfer
+3. Gunakan ID: *${tempId}* untuk konfirmasi
+
+Terima kasih 🌿`;
+
+    window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(pesan)}`, '_blank');
+    
+    // Simpan ke localStorage biar bisa dilacak
+    const pendingOrders = JSON.parse(localStorage.getItem('pendingWAOrders') || '[]');
+    pendingOrders.push({
+        id: tempId,
+        produk: produkNama,
+        waktu: Date.now()
+    });
+    localStorage.setItem('pendingWAOrders', JSON.stringify(pendingOrders));
+    
+    showToast(`✅ ID Sementara: ${tempId} - Simpan ID ini!`, 'success');
+}
+
+// ========== FUNGSI MULTI FOTO PRODUK ==========
+function tampilkanFotoProduk(fotoUrls) {
+    if(!fotoUrls) return '';
+    
+    let html = '<div class="grid grid-cols-3 gap-2 mt-2">';
+    
+    if(Array.isArray(fotoUrls)) {
+        fotoUrls.forEach((foto, index) => {
+            html += `
+                <div class="relative">
+                    <img src="${foto}" class="w-full h-20 object-cover rounded-lg foto-thumbnail" 
+                         onclick="bukaFotoModal('${foto}')" 
+                         onerror="this.src='https://via.placeholder.com/100?text=Error'">
+                </div>
+            `;
+        });
+    } else if(typeof fotoUrls === 'string' && fotoUrls) {
+        html += `
+            <div class="relative col-span-3">
+                <img src="${fotoUrls}" class="w-full h-40 object-cover rounded-lg foto-thumbnail" 
+                     onclick="bukaFotoModal('${fotoUrls}')" 
+                     onerror="this.src='https://via.placeholder.com/300?text=Error'">
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+// ========== FUNGSI FULLSCREEN FOTO ==========
+function bukaFotoModal(src) {
+    const modal = document.getElementById('fotoModal');
+    const img = document.getElementById('fotoFullscreen');
+    
+    if(!modal || !img) {
+        console.error('❌ Modal foto tidak ditemukan');
+        return;
+    }
+    
+    img.src = src;
+    modal.classList.add('show');
+    
+    // Cegah scroll di belakang modal
+    document.body.style.overflow = 'hidden';
+}
+
+function tutupFotoModal(event) {
+    const modal = document.getElementById('fotoModal');
+    
+    // Kalo klik di background atau tombol close, tutup
+    if(!event || event.target === modal || event.target.className === 'close') {
+        modal.classList.remove('show');
+        document.body.style.overflow = ''; // Kembalikan scroll
+    }
+}
+
+// Tutup modal dengan tombol ESC
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Escape') {
+        const modal = document.getElementById('fotoModal');
+        if(modal && modal.classList.contains('show')) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    }
+});
+
     </script>
 
 </body>
