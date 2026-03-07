@@ -1047,16 +1047,31 @@ function cekPesananRealtime() {
                 `;
             }
             
-            let confirmInfo = '';
-            if(order.konfirmasiPembayaran) {
-                confirmInfo = `
-                    <div class="mt-3 p-3 bg-green-50 rounded-lg">
-                        <p class="font-semibold text-green-700">✓ PEMBAYARAN TERKONFIRMASI</p>
-                        <p class="text-xs mt-1">Dari: ${order.konfirmasiPembayaran.pengirim} (${order.konfirmasiPembayaran.bank})</p>
-                        <p class="text-xs">Tanggal: ${order.konfirmasiPembayaran.tanggal}</p>
-                    </div>
-                `;
-            }
+// ========== BAGIAN CONFIRM INFO DI CEK PESANAN (VERSION TIM KAMI) ==========
+let confirmInfo = '';
+if(order.konfirmasiPembayaran) {
+    // Format waktu konfirmasi kalo ada
+    let waktuKonfirmasiText = '';
+    if(order.konfirmasiPembayaran.waktuKonfirmasi) {
+        waktuKonfirmasiText = `<p class="text-xs text-gray-500 mt-1">🕐 ${new Date(order.konfirmasiPembayaran.waktuKonfirmasi).toLocaleString('id-ID')}</p>`;
+    }
+    
+    // Ambil bank (dengan fallback)
+    const bank = order.konfirmasiPembayaran.bank || 'BCA';
+    
+    confirmInfo = `
+        <div class="mt-3 p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+            <p class="font-semibold text-green-700 flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>✓ PEMBAYARAN TERKONFIRMASI
+            </p>
+            <div class="mt-2 text-sm">
+                <p><span class="text-gray-600">Dikonfirmasi oleh:</span> <span class="font-medium text-green-600">Tim Kami</span> <span class="text-gray-500">(Admin)</span></p>
+                <p><span class="text-gray-600">Bank tujuan:</span> ${bank}</p>
+                ${waktuKonfirmasiText}
+            </div>
+        </div>
+    `;
+}
             
             let expiredInfo = '';
             if(order.status === 'kadaluarsa') {
@@ -1371,13 +1386,15 @@ function konfirmasiDariFloating() {
         });
         
         db.ref('pesanan/' + orderId).update({
-            status: 'proses',
-            riwayatStatus: riwayatBaru,
-            konfirmasiPembayaran: {
-                metode: 'Floating Confirm with PIN',
-                waktuKonfirmasi: Date.now(),
-                dikonfirmasiOleh: 'Admin (PIN Verified)'
-            }
+    status: 'proses',
+    riwayatStatus: riwayatBaru,
+    konfirmasiPembayaran: {
+        metode: 'Floating Confirm',
+        waktuKonfirmasi: Date.now(),
+        dikonfirmasiOleh: 'Tim Kami',  // 🔴 GANTI JADI TIM KAMI
+        bank: 'BCA',
+        pengirim: 'Tim Kami'
+    }
         }).then(() => {
             resultDiv.innerHTML = '<p class="text-green-600 font-bold">✅ BERHASIL! Status: DIPROSES</p>';
             resultDiv.classList.remove('hidden');
@@ -1497,14 +1514,14 @@ document.getElementById('konfirmasiInfo').innerHTML = `
                     return;
                 }
                 
-                const konfirmasiData = {
-                    jumlah: jumlah,
-                    bank: bank,
-                    pengirim: pengirim,
-                    tanggal: tanggal,
-                    waktuKonfirmasi: Date.now(),
-                    dikonfirmasiOleh: 'Admin'
-                };
+const konfirmasiData = {
+    jumlah: jumlah || 0,
+    bank: bank || 'BCA',
+    pengirim: 'Tim Kami',  // 🔴 GANTI JADI TIM KAMI
+    tanggal: tanggal || new Date().toISOString().split('T')[0],
+    waktuKonfirmasi: Date.now(),
+    dikonfirmasiOleh: 'Admin'
+};
                 
                 if(buktiFile) {
                     const storageRef = storage.ref('bukti-transfer/' + Date.now() + '_' + buktiFile.name);
@@ -1522,36 +1539,36 @@ document.getElementById('konfirmasiInfo').innerHTML = `
             });
         }
 
-        function updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order) {
-            const riwayatBaru = order.riwayatStatus || [];
-            riwayatBaru.push({
-                status: 'proses',
-                waktu: Date.now(),
-                catatan: `Pembayaran dikonfirmasi - ${konfirmasiData.pengirim} (${konfirmasiData.bank}) Rp ${(konfirmasiData.jumlah || 0).toLocaleString()}`
-            });
-            
-            return db.ref('pesanan/' + orderId).update({
-                status: 'proses',
-                riwayatStatus: riwayatBaru,
-                konfirmasiPembayaran: konfirmasiData,
-                waktuKonfirmasi: Date.now()
-            }).then(() => {
-                showToast('✅ Pembayaran dikonfirmasi! Status: DIPROSES', 'success');
-                tutupKonfirmasiModal();
-                document.getElementById('adminConfirmId').value = '';
-                
-                const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
-                    `Halo ${order.nama},\n` +
-                    `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
-                    `📦 *Status Terbaru:* DIPROSES\n` +
-                    `Kami akan segera memproses pesanan Anda.\n\n` +
-                    `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
-                
-                window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
-                
-                filterPesanan();
-            });
-        }
+function updatePesananSetelahKonfirmasi(orderId, konfirmasiData, order) {
+    const riwayatBaru = order.riwayatStatus || [];
+    riwayatBaru.push({
+        status: 'proses',
+        waktu: Date.now(),
+        catatan: `Pembayaran dikonfirmasi oleh Tim Kami - Rp ${(konfirmasiData.jumlah || 0).toLocaleString()}`
+    });
+    
+    return db.ref('pesanan/' + orderId).update({
+        status: 'proses',
+        riwayatStatus: riwayatBaru,
+        konfirmasiPembayaran: konfirmasiData,
+        waktuKonfirmasi: Date.now()
+    }).then(() => {
+        showToast('✅ Pembayaran dikonfirmasi! Status: DIPROSES', 'success');
+        tutupKonfirmasiModal();
+        document.getElementById('adminConfirmId').value = '';
+        
+        const pesanWA = `✅ *PEMBAYARAN DIKONFIRMASI!*\n\n` +
+            `Halo ${order.nama},\n` +
+            `Pembayaran untuk pesanan *${order.kode}* sudah kami terima dan konfirmasi.\n\n` +
+            `📦 *Status Terbaru:* DIPROSES\n` +
+            `Kami akan segera memproses pesanan Anda.\n\n` +
+            `Terima kasih telah berbelanja di Jamu Herbal Alami 🌿`;
+        
+        window.open(`https://wa.me/${formatWA(order.wa)}?text=${encodeURIComponent(pesanWA)}`, '_blank');
+        
+        filterPesanan();
+    });
+}
 
         // ========== MODAL REVIEW ==========
 function bukaReviewModal(orderId, produkId, produkNama) {
